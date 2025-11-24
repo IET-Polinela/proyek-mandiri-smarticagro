@@ -10,38 +10,42 @@ export function Team() {
   const teamMembers = [
     {
       name: "Amanda Bulan Nayla",
-      role: "Project Leader & AI Developer",
-      npm: "2315051001",
-      gradient: "from-pink-500 to-rose-600"
+      role: "Project Leader",
+      npm: "23758003",
+      gradient: "from-pink-500 to-rose-600",
+      image: "/src/assets/images/Amandabulan.jpeg"
     },
     {
       name: "Gilang Rizki Ramadhan",
-      role: "IoT Hardware Engineer",
-      npm: "2315051002",
-      gradient: "from-blue-500 to-cyan-600"
+      role: "Mobile Developer",
+      npm: "23758012",
+      gradient: "from-blue-500 to-cyan-600",
+      image: "/src/assets/images/GilangRamadhani.jpeg"
     },
     {
       name: "Syahreza Riatma",
-      role: "Android Developer",
-      npm: "2315051003",
-      gradient: "from-purple-500 to-indigo-600"
+      role: "IoT Engineer",
+      npm: "23758028",
+      gradient: "from-purple-500 to-indigo-600",
+      image: "/src/assets/images/SyahrezaRiatma.jpeg"
     },
     {
       name: "Hafish Arrusal Isfalana",
-      role: "Backend Developer",
-      npm: "2315051004",
-      gradient: "from-green-500 to-emerald-600"
+      role: "IoT Engineer",
+      npm: "23758042",
+      gradient: "from-green-500 to-emerald-600",
+      image: "/src/assets/images/HafishArrusal.jpeg"
     },
     {
       name: "Rahmat Hadinata",
       role: "System Integration Specialist",
-      npm: "2315051005",
+      npm: "23758051",
       gradient: "from-orange-500 to-amber-600"
     },
     {
       name: "Satria Divo Praditya",
-      role: "Data Analyst",
-      npm: "2315051006",
+      role: "Backend Developer",
+      npm: "23758058",
       gradient: "from-teal-500 to-cyan-600"
     }
   ];
@@ -90,9 +94,17 @@ export function Team() {
                 {/* Avatar Circle */}
                 <div className="relative -mt-12 mb-4">
                   <div className={`w-24 h-24 bg-white rounded-2xl mx-auto border-4 border-white shadow-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                    <div className={`w-20 h-20 bg-gradient-to-br ${member.gradient} rounded-xl flex items-center justify-center`}>
-                      <User className="w-10 h-10 text-white" />
-                    </div>
+                    {member.image ? (
+                      <img
+                        src={member.image}
+                        alt={member.name}
+                        className="w-20 h-20 object-cover rounded-xl"
+                      />
+                    ) : (
+                      <div className={`w-20 h-20 bg-gradient-to-br ${member.gradient} rounded-xl flex items-center justify-center`}>
+                        <User className="w-10 h-10 text-white" />
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -131,8 +143,12 @@ export function Team() {
         >
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
           <div className="relative">
-            <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <User className="w-10 h-10 text-white" />
+            <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-6 overflow-hidden">
+              <img
+                src="/src/assets/images/Septafianyah.jpg"
+                alt="Dr. Ir. Septafiansyah Dwi Putra"
+                className="w-20 h-20 object-cover rounded-2xl"
+              />
             </div>
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full mb-6">
               <span className="text-white text-sm">Dosen Pembimbing</span>
@@ -141,7 +157,7 @@ export function Team() {
               Dr. Ir. Septafiansyah Dwi Putra, S.T., M.T., IPM., ASEAN Eng.
             </h3>
             <p className="text-green-100 mb-8 max-w-2xl mx-auto text-lg">
-              Dosen Jurusan Teknik Elektro, Politeknik Negeri Lampung
+              Dosen Jurusan Teknologi Informasi, Politeknik Negeri Lampung
             </p>
             <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm rounded-xl">
               <Mail className="w-5 h-5 text-white" />
@@ -163,7 +179,7 @@ export function Team() {
             </div>
             <div className="text-left">
               <div className="text-gray-900 text-lg">Politeknik Negeri Lampung</div>
-              <div className="text-gray-600">Jurusan Teknik Elektro</div>
+              <div className="text-gray-600">Jurusan Teknologi Informasi</div>
             </div>
           </div>
         </motion.div>
