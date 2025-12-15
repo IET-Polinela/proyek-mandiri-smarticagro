@@ -40,7 +40,8 @@ export function Team() {
       name: "Rahmat Hadinata",
       role: "System Integration Specialist",
       npm: "23758051",
-      gradient: "from-orange-500 to-amber-600"
+      gradient: "from-orange-500 to-amber-600",
+      image: "/src/assets/images/Rahmathadinata.jpeg"
     },
     {
       name: "Satria Divo Praditya",
