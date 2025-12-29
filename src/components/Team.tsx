@@ -10,7 +10,7 @@ export function Team() {
   const teamMembers = [
     {
       name: "Amanda Bulan Nayla",
-      role: "Project Leader",
+      role: "Designer",
       npm: "23758003",
       gradient: "from-pink-500 to-rose-600",
       image: "/src/assets/images/Amandabulan.jpeg"
@@ -31,7 +31,7 @@ export function Team() {
     },
     {
       name: "Hafish Arrusal Isfalana",
-      role: "IoT Engineer",
+      role: "Project Leader",
       npm: "23758042",
       gradient: "from-green-500 to-emerald-600",
       image: "/src/assets/images/HafishArrusal.jpeg"
@@ -47,7 +47,8 @@ export function Team() {
       name: "Satria Divo Praditya",
       role: "Backend Developer",
       npm: "23758058",
-      gradient: "from-teal-500 to-cyan-600"
+      gradient: "from-teal-500 to-cyan-600",
+      image: "/src/assets/images/SatriaDivo.jpeg"
     }
   ];
 

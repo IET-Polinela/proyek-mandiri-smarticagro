@@ -125,7 +125,7 @@ export function Footer() {
               </div>
               <div className="text-left">
                 <div className="text-white">Politeknik Negeri Lampung</div>
-                <div className="text-gray-400 text-sm">Jurusan Teknik Elektro</div>
+                <div className="text-gray-400 text-sm">Teknologi Rekayasa Internet</div>
               </div>
             </div>
           </div>

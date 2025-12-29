@@ -29,7 +29,7 @@
 ## Detail teknis singkat
   - Perangkat: ESP32 (mikrokontroler) + sensor multi-parameter + modul GPS (mis. LilyGO T-Beam).
   - Komunikasi: data dikirim melalui MQTT ke cloud.
-  - Analisis: Random Forest memproses parameter (N, P, K, pH, suhu, kelembapan, lokasi/elevation).
+  - Analisis: Random Forest memproses parameter (N, P, K, pH, suhu, kelembapan, altitude/ketinggian lahan).
   - Output: rekomendasi tanaman dalam bentuk persentase kecocokan, ditampilkan di aplikasi Android.
 
 

@@ -17,7 +17,7 @@ export function Features() {
     {
       icon: MapPin,
       title: "GPS Presisi Tinggi",
-      description: "LilyGO T-Beam dengan kemampuan tracking lokasi longitude dan latitude akurat",
+      description: "LilyGO T-Beam untuk mengukur altitude (ketinggian lahan) dengan presisi tinggi",
       gradient: "from-blue-500 to-cyan-600"
     },
     {

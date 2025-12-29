@@ -17,7 +17,7 @@ export function AboutInnovation() {
     {
       icon: Wifi,
       title: "ESP32 & GPS",
-      description: "Mikrokontroler dengan GPS LilyGO T-Beam",
+      description: "Mikrokontroler dengan GPS LilyGO T-Beam untuk mengukur ketinggian lahan",
       color: "blue"
     },
     {
@@ -62,7 +62,7 @@ export function AboutInnovation() {
             Solusi <span className="text-green-600">IoT</span> untuk Pertanian Presisi
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto text-lg">
-            Sistem Tanam Cerdas merupakan solusi berbasis Internet of Things yang memanfaatkan sensor 7-in-1 dan GPS LilyGO T-Beam untuk membaca unsur hara tanah.
+            Sistem Tanam Cerdas merupakan solusi berbasis Internet of Things yang memanfaatkan sensor 7-in-1 dan GPS LilyGO T-Beam untuk mengukur ketinggian lahan dan membaca unsur hara tanah.
           </p>
         </motion.div>
 
