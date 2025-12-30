@@ -1,7 +1,16 @@
 import { motion } from "motion/react";
 import { useInView } from "motion/react";
 import { useRef } from "react";
-import { Layers, Wifi, Cloud, Brain, Smartphone, ArrowRight } from "lucide-react";
+import { 
+  SensorIcon, 
+  WiFiNodeIcon, 
+  CloudDataIcon, 
+  AIBrainIcon, 
+  MobileAppIcon,
+  AccuracyIcon,
+  RealtimeIcon,
+  SpatialIcon
+} from "./CustomIcons";
 
 export function AboutInnovation() {
   const ref = useRef(null);
@@ -9,31 +18,31 @@ export function AboutInnovation() {
 
   const steps = [
     {
-      icon: Layers,
+      icon: SensorIcon,
       title: "Sensor 7-in-1",
       description: "Membaca N, P, K, pH, suhu, kelembapan, EC",
       color: "green"
     },
     {
-      icon: Wifi,
+      icon: WiFiNodeIcon,
       title: "ESP32 & GPS",
       description: "Mikrokontroler dengan GPS LilyGO T-Beam untuk mengukur ketinggian lahan",
       color: "blue"
     },
     {
-      icon: Cloud,
+      icon: CloudDataIcon,
       title: "Cloud MQTT",
       description: "Data dikirim ke cloud via MQTT",
       color: "purple"
     },
     {
-      icon: Brain,
+      icon: AIBrainIcon,
       title: "AI Random Forest",
       description: "Analisis data dengan kecerdasan buatan",
       color: "orange"
     },
     {
-      icon: Smartphone,
+      icon: MobileAppIcon,
       title: "Aplikasi Android",
       description: "Hasil rekomendasi di smartphone",
       color: "teal"
@@ -91,8 +100,10 @@ export function AboutInnovation() {
                   className="relative group"
                 >
                   <div className="bg-white rounded-2xl p-6 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:shadow-gray-300/50 transition-all duration-300 border border-gray-100 h-full">
-                    <div className={`w-14 h-14 bg-gradient-to-br ${colorMap[step.color]} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-${step.color}-600/20`}>
-                      <Icon className="w-7 h-7 text-white" />
+                    <div className={`w-14 h-14 bg-gradient-to-br ${colorMap[step.color]} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-${step.color}-600/20 text-white`}>
+                    <div className="w-7 h-7">
+                      <Icon />
+                    </div>
                     </div>
                     <h3 className="text-gray-900 mb-2 text-lg">
                       {step.title}
@@ -105,7 +116,9 @@ export function AboutInnovation() {
                   {/* Arrow */}
                   {index < steps.length - 1 && (
                     <div className="hidden lg:block absolute top-1/2 -right-3 transform -translate-y-1/2 z-10">
-                      <ArrowRight className="w-6 h-6 text-gray-300" />
+                      <svg className="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
                     </div>
                   )}
                 </motion.div>
@@ -122,21 +135,27 @@ export function AboutInnovation() {
           className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8"
         >
           <div className="text-center p-8 rounded-2xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100">
-            <div className="text-4xl text-green-600 mb-3">🎯</div>
+            <div className="w-16 h-16 mx-auto mb-3 text-green-600">
+              <AccuracyIcon />
+            </div>
             <h3 className="text-gray-900 mb-2 text-lg">Akurasi Tinggi</h3>
             <p className="text-gray-600 text-sm">
               Rekomendasi berbasis data ilmiah dan algoritma Random Forest
             </p>
           </div>
           <div className="text-center p-8 rounded-2xl bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-100">
-            <div className="text-4xl text-blue-600 mb-3">⚡</div>
+            <div className="w-16 h-16 mx-auto mb-3 text-blue-600">
+              <RealtimeIcon />
+            </div>
             <h3 className="text-gray-900 mb-2 text-lg">Real-time</h3>
             <p className="text-gray-600 text-sm">
               Monitoring kondisi tanah secara langsung kapan saja
             </p>
           </div>
           <div className="text-center p-8 rounded-2xl bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-100">
-            <div className="text-4xl text-purple-600 mb-3">🌍</div>
+            <div className="w-16 h-16 mx-auto mb-3 text-purple-600">
+              <SpatialIcon />
+            </div>
             <h3 className="text-gray-900 mb-2 text-lg">Analisis Spasial</h3>
             <p className="text-gray-600 text-sm">
               Memanfaatkan data GPS untuk rekomendasi berdasarkan lokasi

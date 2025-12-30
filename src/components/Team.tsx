@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { useInView } from "motion/react";
 import { useRef } from "react";
-import { Linkedin, Mail, User } from "lucide-react";
+import { Github, Mail, User } from "lucide-react";
 
 export function Team() {
   const ref = useRef(null);
@@ -13,42 +13,54 @@ export function Team() {
       role: "Designer",
       npm: "23758003",
       gradient: "from-pink-500 to-rose-600",
-      image: "/src/assets/images/Amandabulan.jpeg"
+      image: "/src/assets/images/Amandabulan.jpeg",
+      github: "https://github.com/amandabulan",
+      email: "amandbulan@gmail.com"
     },
     {
       name: "Gilang Rizki Ramadhan",
       role: "Mobile Developer",
       npm: "23758012",
       gradient: "from-blue-500 to-cyan-600",
-      image: "/src/assets/images/GilangRamadhani.jpeg"
+      image: "/src/assets/images/GilangRamadhani.jpeg",
+      github: "https://github.com/gilangrizkiramadhan19",
+      email: "gilangrizkiramadhan1906@gmail.com"
     },
     {
       name: "Syahreza Riatma",
       role: "IoT Engineer",
       npm: "23758028",
       gradient: "from-purple-500 to-indigo-600",
-      image: "/src/assets/images/SyahrezaRiatma.jpeg"
+      image: "/src/assets/images/SyahrezaRiatma.jpeg",
+      github: "https://github.com/Syahreza09",
+      email: "syahrezariatma8@gmail.com"
     },
     {
       name: "Hafish Arrusal Isfalana",
       role: "Project Leader",
       npm: "23758042",
       gradient: "from-green-500 to-emerald-600",
-      image: "/src/assets/images/HafishArrusal.jpeg"
+      image: "/src/assets/images/HafishArrusal.jpeg",
+      github: "https://github.com/Hafish23758042",
+      email: "hafisharrusal77@gmail.com"
     },
     {
       name: "Rahmat Hadinata",
       role: "System Integration Specialist",
       npm: "23758051",
       gradient: "from-orange-500 to-amber-600",
-      image: "/src/assets/images/Rahmathadinata.jpeg"
+      image: "/src/assets/images/Rahmathadinata.jpeg",
+      github: "https://github.com/RahmatHadinata23758051",
+      email: "rsafei731@gmail.com"
     },
     {
       name: "Satria Divo Praditya",
       role: "Backend Developer",
       npm: "23758058",
       gradient: "from-teal-500 to-cyan-600",
-      image: "/src/assets/images/SatriaDivo.jpeg"
+      image: "/src/assets/images/SatriaDivo.jpeg",
+      github: "https://github.com/SatriaDivo",
+      email: "satriadivop354@gmail.com"
     }
   ];
 
@@ -123,12 +135,28 @@ export function Team() {
                   </div>
 
                   <div className="flex items-center justify-center gap-3">
-                    <button className="w-10 h-10 bg-gray-100 hover:bg-blue-100 rounded-xl flex items-center justify-center transition-colors group/icon">
-                      <Linkedin className="w-5 h-5 text-gray-600 group-hover/icon:text-blue-600" />
-                    </button>
-                    <button className="w-10 h-10 bg-gray-100 hover:bg-green-100 rounded-xl flex items-center justify-center transition-colors group/icon">
+                    {member.github ? (
+                      <a 
+                        href={member.github} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="w-10 h-10 bg-gray-100 hover:bg-gray-800 rounded-xl flex items-center justify-center transition-colors group/icon"
+                      >
+                        <Github className="w-5 h-5 text-gray-600 group-hover/icon:text-gray-100" />
+                      </a>
+                    ) : (
+                      <button className="w-10 h-10 bg-gray-100 hover:bg-gray-800 rounded-xl flex items-center justify-center transition-colors group/icon cursor-not-allowed opacity-50">
+                        <Github className="w-5 h-5 text-gray-600" />
+                      </button>
+                    )}
+                    <a 
+                      href={`https://mail.google.com/mail/?view=cm&fs=1&to=${member.email}&subject=Kontak dari SmartIC Agro&body=Halo ${member.name},%0A%0ASaya ingin menghubungi Anda melalui SmartIC Agro.%0A%0ATerima kasih.`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 bg-gray-100 hover:bg-green-100 rounded-xl flex items-center justify-center transition-colors group/icon"
+                    >
                       <Mail className="w-5 h-5 text-gray-600 group-hover/icon:text-green-600" />
-                    </button>
+                    </a>
                   </div>
                 </div>
               </div>

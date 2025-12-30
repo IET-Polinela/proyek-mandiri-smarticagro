@@ -1,7 +1,16 @@
 import { motion } from "motion/react";
 import { useInView } from "motion/react";
 import { useRef } from "react";
-import { TrendingUp, Target, DollarSign, Leaf, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
+import { 
+  TrendingUpIcon,
+  TargetIcon,
+  DollarSignIcon,
+  LeafIcon,
+  LandMonitorIcon, 
+  FarmerIcon, 
+  DataPointsIcon
+} from "./CustomIcons";
 
 export function Impact() {
   const ref = useRef(null);
@@ -9,28 +18,28 @@ export function Impact() {
 
   const impacts = [
     {
-      icon: TrendingUp,
+      icon: TrendingUpIcon,
       title: "Efisiensi Sumber Daya",
       description: "Penggunaan air dan pupuk meningkat hingga 40% lebih efisien",
       stat: "+40%",
       gradient: "from-green-500 to-emerald-600"
     },
     {
-      icon: Target,
+      icon: TargetIcon,
       title: "Akurasi Rekomendasi",
       description: "Model AI menghasilkan akurasi prediksi di atas 90%",
       stat: ">90%",
       gradient: "from-blue-500 to-cyan-600"
     },
     {
-      icon: DollarSign,
+      icon: DollarSignIcon,
       title: "Penghematan Biaya",
       description: "Eliminasi biaya analisis tanah laboratorium yang mahal",
       stat: "60%",
       gradient: "from-purple-500 to-indigo-600"
     },
     {
-      icon: Leaf,
+      icon: LeafIcon,
       title: "Pertanian Berkelanjutan",
       description: "Mendukung konsep precision agriculture untuk masa depan",
       stat: "100%",
@@ -39,10 +48,10 @@ export function Impact() {
   ];
 
   const stats = [
-    { value: "150+", label: "Hektar Lahan Termonitor", icon: "🌾" },
-    { value: "50+", label: "Petani Teredukasi", icon: "👨‍🌾" },
-    { value: "1000+", label: "Data Point Terkumpul", icon: "📊" },
-    { value: "92%", label: "Kepuasan Pengguna", icon: "🎯" }
+    { icon: LandMonitorIcon, value: "150+", label: "Hektar Lahan Termonitor" },
+    { icon: FarmerIcon, value: "50+", label: "Petani Teredukasi" },
+    { icon: DataPointsIcon, value: "1000+", label: "Data Point Terkumpul" },
+    { icon: TargetIcon, value: "92%", label: "Kepuasan Pengguna" }
   ];
 
   return (
@@ -83,8 +92,10 @@ export function Impact() {
                 className="group"
               >
                 <div className="bg-white border border-gray-200 rounded-2xl p-8 hover:border-green-200 hover:shadow-xl transition-all duration-300 h-full">
-                  <div className={`w-14 h-14 bg-gradient-to-br ${impact.gradient} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg`}>
-                    <Icon className="w-7 h-7 text-white" />
+                <div className={`w-14 h-14 bg-gradient-to-br ${impact.gradient} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg text-white`}>
+                    <div className="w-7 h-7">
+                      <Icon />
+                    </div>
                   </div>
                   <div className={`text-4xl bg-gradient-to-br ${impact.gradient} bg-clip-text text-transparent mb-4`}>
                     {impact.stat}
@@ -149,19 +160,24 @@ export function Impact() {
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-              {stats.map((stat, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.6, delay: 0.8 + index * 0.1 }}
-                  className="bg-white rounded-2xl p-6 text-center shadow-lg border border-green-100 hover:shadow-xl transition-all"
-                >
-                  <div className="text-4xl mb-3">{stat.icon}</div>
-                  <div className="text-3xl text-green-600 mb-2">{stat.value}</div>
-                  <div className="text-sm text-gray-600">{stat.label}</div>
-                </motion.div>
-              ))}
+              {stats.map((stat, index) => {
+                const StatIcon = stat.icon;
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.6, delay: 0.8 + index * 0.1 }}
+                    className="bg-white rounded-2xl p-6 text-center shadow-lg border border-green-100 hover:shadow-xl transition-all"
+                  >
+                    <div className="w-12 h-12 mx-auto mb-3 text-green-600">
+                      <StatIcon />
+                    </div>
+                    <div className="text-3xl text-green-600 mb-2">{stat.value}</div>
+                    <div className="text-sm text-gray-600">{stat.label}</div>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
         </motion.div>
@@ -174,7 +190,9 @@ export function Impact() {
           className="mt-16 text-center"
         >
           <div className="inline-flex items-center gap-3 px-8 py-4 bg-green-100 text-green-700 rounded-full border border-green-200">
-            <Leaf className="w-5 h-5" />
+            <div className="w-5 h-5">
+              <LeafIcon />
+            </div>
             <span>Berkontribusi pada Sustainable Development Goals (SDGs)</span>
           </div>
         </motion.div>
