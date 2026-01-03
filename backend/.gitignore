@@ -3,3 +3,12 @@ node_modules/
 *.log
 coverage/
 .DS_Store
+
+# Python virtual environment
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
