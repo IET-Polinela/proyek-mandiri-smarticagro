@@ -5,10 +5,10 @@ const mqttService = require('../services/mqtt.service');
 class PredictionController {
     async predictCrop(req, res) {
         try {
-            const { N, P, K, temperature, humidity, pH, rainfall } = req.body;
+            const { N, P, K, temperature, humidity, pH, altitude } = req.body;
 
             // Validasi input
-            const requiredFields = ['N', 'P', 'K', 'temperature', 'humidity', 'pH', 'rainfall'];
+            const requiredFields = ['N', 'P', 'K', 'temperature', 'humidity', 'pH'];
             const missingFields = requiredFields.filter(field => req.body[field] === undefined);
 
             if (missingFields.length > 0) {
@@ -26,7 +26,7 @@ class PredictionController {
                 temperature: parseFloat(temperature),
                 humidity: parseFloat(humidity),
                 pH: parseFloat(pH),
-                rainfall: parseFloat(rainfall)
+                altitude: parseFloat(altitude || 0)
             };
 
             // Python shell options
@@ -100,7 +100,7 @@ class PredictionController {
                 });
             }
 
-            // Tambahkan rainfall default jika tidak ada
+            // Prepare input data with altitude
             const inputData = {
                 N: parseFloat(latestData.N),
                 P: parseFloat(latestData.P),
@@ -108,7 +108,7 @@ class PredictionController {
                 temperature: parseFloat(latestData.temperature),
                 humidity: parseFloat(latestData.humidity),
                 pH: parseFloat(latestData.pH),
-                rainfall: parseFloat(req.query.rainfall || 100) // default rainfall
+                altitude: parseFloat(req.query.altitude || 0) // altitude from query or default 0
             };
 
             // Python shell options

@@ -1,84 +1,130 @@
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.preprocessing import StandardScaler
 import joblib
 import numpy as np
+import pandas as pd
 import json
 import sys
 import os
 import warnings
 
-# Suppress warnings
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
-# Load model
-MODEL_PATH = os.path.join(os.path.dirname(__file__), 'models', 'crop_model_bundle.joblib')
+# ======================================================
+# LOAD MODEL
+# ======================================================
+BASE_DIR = os.path.dirname(__file__)
+
+MODEL_PATH = os.path.join(BASE_DIR, "models", "crop_model_bundle.joblib")
+ALTITUDE_RULE_PATH = os.path.join(BASE_DIR, "data", "crop_altitude_rules.csv")
 
 try:
     model_bundle = joblib.load(MODEL_PATH)
-    
-    model = model_bundle.get('model') or model_bundle.get('classifier')
-    scaler = model_bundle.get('scaler') or model_bundle.get('StandardScaler')
-    
-    # Check for label_encoder or labels list
-    label_encoder = model_bundle.get('label_encoder') or model_bundle.get('LabelEncoder')
-    labels = model_bundle.get('labels')
-    
-    if not all([model, scaler]) or not (label_encoder or labels):
-        raise ValueError("Model bundle incomplete. Required: model, scaler, and (label_encoder or labels)")
-        
+
+    model = model_bundle["model"]
+    scaler = model_bundle["scaler"]
+    labels = model_bundle["labels"]
+
 except Exception as e:
     print(json.dumps({
-        'status': 'error',
-        'message': f'Error loading model: {str(e)}'
+        "status": "error",
+        "message": f"Model load failed: {str(e)}"
     }))
     sys.exit(1)
 
 
+# ======================================================
+# LOAD ALTITUDE RULE DATA
+# ======================================================
+try:
+    altitude_df = pd.read_csv(ALTITUDE_RULE_PATH)
+
+    # Normalize crop names for safe matching
+    altitude_df["crop"] = altitude_df["crop"].str.lower()
+
+except Exception as e:
+    print(json.dumps({
+        "status": "error",
+        "message": f"Altitude rule load failed: {str(e)}"
+    }))
+    sys.exit(1)
+
+
+# ======================================================
+# ALTITUDE FILTER FUNCTION
+# ======================================================
+def filter_by_altitude(top_crops, altitude):
+    """
+    Filter ML results based on altitude suitability
+    """
+    filtered = []
+
+    for item in top_crops:
+        crop_name = item["crop"].lower()
+
+        rule = altitude_df[altitude_df["crop"] == crop_name]
+        if rule.empty:
+            continue
+
+        min_alt = rule.iloc[0]["min_altitude"]
+        max_alt = rule.iloc[0]["max_altitude"]
+
+        if min_alt <= altitude <= max_alt:
+            filtered.append(item)
+
+    return filtered
+
+
+# ======================================================
+# PREDICTION FUNCTION
+# ======================================================
 def predict_crop(data):
     try:
-        # Model only uses 6 features: N, P, K, temperature, humidity, ph
+        # -------------------------------
+        # INPUT FEATURES (ML)
+        # -------------------------------
         features = np.array([[
-            float(data['N']),
-            float(data['P']),
-            float(data['K']),
-            float(data['temperature']),
-            float(data['humidity']),
-            float(data.get('pH') or data.get('ph'))  # Accept both pH and ph
+            float(data["N"]),
+            float(data["P"]),
+            float(data["K"]),
+            float(data["temperature"]),
+            float(data["humidity"]),
+            float(data.get("pH") or data.get("ph"))
         ]])
+
+        altitude = float(data.get("altitude", 0))
 
         features_scaled = scaler.transform(features)
 
-        prediction = model.predict(features_scaled)
-        prediction_proba = model.predict_proba(features_scaled)
+        # -------------------------------
+        # ML PREDICTION
+        # -------------------------------
+        proba = model.predict_proba(features_scaled)[0]
 
-        # Get top 5 crops with highest probability
-        top_indices = np.argsort(prediction_proba[0])[::-1][:5]
-        top_crops = []
+        top_indices = np.argsort(proba)[::-1][:5]
+        top_crops = [
+            {
+                "crop": labels[idx],
+                "probability": round(float(proba[idx]) * 100, 2)
+            }
+            for idx in top_indices
+        ]
 
-        for idx in top_indices:
-            crop_name = labels[idx]
-            probability = float(prediction_proba[0][idx])
-            top_crops.append({
-                'crop': crop_name,
-                'probability': round(probability * 100, 2)
-            })
+        # -------------------------------
+        # ALTITUDE FILTERING
+        # -------------------------------
+        altitude_filtered = filter_by_altitude(top_crops, altitude)
 
-        # prediction[0] is already the predicted crop name (string)
-        predicted_crop = prediction[0]
-        
-        # Find the index of predicted crop to get its confidence
-        try:
-            predicted_idx = labels.index(predicted_crop)
-            confidence = round(float(prediction_proba[0][predicted_idx]) * 100, 2)
-        except (ValueError, IndexError):
-            confidence = round(float(np.max(prediction_proba[0])) * 100, 2)
+        # fallback if empty
+        final_crops = altitude_filtered if altitude_filtered else top_crops[:3]
 
         result = {
-            'status': 'success',
-            'data': {
-                'prediction': predicted_crop,
-                'confidence': confidence,
-                'top_crops': top_crops
+            "status": "success",
+            "data": {
+                "altitude": altitude,
+                "prediction": final_crops[0]["crop"],
+                "confidence": final_crops[0]["probability"],
+                "top_crops": final_crops
             }
         }
 
@@ -86,12 +132,15 @@ def predict_crop(data):
 
     except Exception as e:
         print(json.dumps({
-            'status': 'error',
-            'message': str(e)
+            "status": "error",
+            "message": str(e)
         }))
         sys.exit(1)
 
 
-if __name__ == '__main__':
+# ======================================================
+# ENTRY POINT
+# ======================================================
+if __name__ == "__main__":
     input_data = json.loads(sys.stdin.read())
     predict_crop(input_data)

@@ -48,7 +48,7 @@ class PredictionService {
                 temperature: sensorData.temperature || 0,
                 humidity: sensorData.humidity || 0,
                 pH: sensorData.pH || 0,
-                rainfall: sensorData.rainfall || sensorData.ec || 0
+                altitude: sensorData.altitude || 0
             };
 
             const prediction = await this.predictCrop(input);
