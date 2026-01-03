@@ -1,17 +1,18 @@
-# SmartIcAgro Backend API Documentation
+# Dokumentasi API Backend SmartIcAgro
 
 Base URL: `http://localhost:5010`
 
-## Table of Contents
-- [Authentication](#authentication)
-- [Sensor Data](#sensor-data)
-- [Prediction](#prediction)
+## Daftar Isi
+- [Autentikasi](#autentikasi)
+- [Data Sensor](#data-sensor)
+- [Prediksi](#prediksi)
+- [Daftar API Tersedia](#daftar-api-tersedia)
 
 ---
 
-## Authentication
+## Autentikasi
 
-### 1. Register User
+### 1. Registrasi User
 **Endpoint:** `POST /api/auth/register`
 
 **Request Body:**
@@ -23,7 +24,7 @@ Base URL: `http://localhost:5010`
 }
 ```
 
-**Response (Success):**
+**Response (Sukses):**
 ```json
 {
   "status": "success",
@@ -51,7 +52,7 @@ Base URL: `http://localhost:5010`
 }
 ```
 
-**Response (Success):**
+**Response (Sukses):**
 ```json
 {
   "status": "success",
@@ -69,7 +70,7 @@ Base URL: `http://localhost:5010`
 
 ---
 
-### 3. Get Profile
+### 3. Dapatkan Profile
 **Endpoint:** `GET /api/auth/profile`
 
 **Headers:**
@@ -77,7 +78,7 @@ Base URL: `http://localhost:5010`
 Authorization: Bearer <token>
 ```
 
-**Response (Success):**
+**Response (Sukses):**
 ```json
 {
   "status": "success",
@@ -94,12 +95,12 @@ Authorization: Bearer <token>
 
 ---
 
-## Sensor Data
+## Data Sensor
 
-### 1. Get Latest Sensor Data
+### 1. Dapatkan Data Sensor Terbaru
 **Endpoint:** `GET /api/sensor/latest`
 
-**Response (Success):**
+**Response (Sukses):**
 ```json
 {
   "status": "success",
@@ -117,7 +118,7 @@ Authorization: Bearer <token>
 }
 ```
 
-**Response (MQTT Disconnected):**
+**Response (MQTT Terputus):**
 ```json
 {
   "status": "success",
@@ -137,7 +138,7 @@ Authorization: Bearer <token>
 
 ---
 
-### 2. Health Check
+### 2. Cek Kesehatan API
 **Endpoint:** `GET /api/health`
 
 **Response:**
@@ -152,9 +153,9 @@ Authorization: Bearer <token>
 
 ---
 
-## Prediction
+## Prediksi
 
-### 1. Predict Crop (Custom Data)
+### 1. Prediksi Tanaman (Data Custom)
 **Endpoint:** `POST /api/predict`
 
 **Headers:**
@@ -176,16 +177,16 @@ Content-Type: application/json
 }
 ```
 
-**Parameters:**
-- `N` (number, required): Nitrogen level
-- `P` (number, required): Phosphorus level
-- `K` (number, required): Potassium level
-- `temperature` (number, required): Temperature in Celsius
-- `humidity` (number, required): Humidity percentage
-- `pH` (number, required): Soil pH level
-- `altitude` (number, optional): Altitude in meters (default: 0)
+**Parameter:**
+- `N` (number, wajib): Level Nitrogen
+- `P` (number, wajib): Level Phosphorus
+- `K` (number, wajib): Level Potassium
+- `temperature` (number, wajib): Suhu dalam Celsius
+- `humidity` (number, wajib): Persentase kelembaban
+- `pH` (number, wajib): Level pH tanah
+- `altitude` (number, opsional): Ketinggian dalam meter (default: 0)
 
-**Response (Success):**
+**Response (Sukses):**
 ```json
 {
   "status": "success",
@@ -211,7 +212,7 @@ Content-Type: application/json
 }
 ```
 
-**Example with cURL:**
+**Contoh dengan cURL:**
 ```bash
 curl -X POST http://localhost:5010/api/predict \
   -H "Authorization: Bearer <token>" \
@@ -227,7 +228,7 @@ curl -X POST http://localhost:5010/api/predict \
   }'
 ```
 
-**Example with PowerShell:**
+**Contoh dengan PowerShell:**
 ```powershell
 $token = "your_token_here"
 $headers = @{Authorization="Bearer $token"}
@@ -250,7 +251,7 @@ Invoke-RestMethod -Uri 'http://localhost:5010/api/predict' `
 
 ---
 
-### 2. Predict from Latest Sensor Data
+### 2. Prediksi dari Data Sensor Terbaru
 **Endpoint:** `GET /api/predict/latest`
 
 **Headers:**
@@ -259,14 +260,14 @@ Authorization: Bearer <token>
 ```
 
 **Query Parameters:**
-- `altitude` (number, optional): Altitude in meters (default: 0)
+- `altitude` (number, opsional): Ketinggian dalam meter (default: 0)
 
-**Example:**
+**Contoh:**
 ```
 GET /api/predict/latest?altitude=500
 ```
 
-**Response (Success):**
+**Response (Sukses):**
 ```json
 {
   "status": "success",
@@ -302,7 +303,7 @@ GET /api/predict/latest?altitude=500
 }
 ```
 
-**Response (No Sensor Data):**
+**Response (Tidak Ada Data Sensor):**
 ```json
 {
   "status": "error",
@@ -310,7 +311,7 @@ GET /api/predict/latest?altitude=500
 }
 ```
 
-**Response (MQTT Disconnected):**
+**Response (MQTT Terputus):**
 ```json
 {
   "status": "error",
@@ -318,13 +319,13 @@ GET /api/predict/latest?altitude=500
 }
 ```
 
-**Example with cURL:**
+**Contoh dengan cURL:**
 ```bash
 curl -X GET "http://localhost:5010/api/predict/latest?altitude=500" \
   -H "Authorization: Bearer <token>"
 ```
 
-**Example with PowerShell:**
+**Contoh dengan PowerShell:**
 ```powershell
 $token = "your_token_here"
 $headers = @{Authorization="Bearer $token"}
@@ -336,7 +337,7 @@ Invoke-RestMethod -Uri 'http://localhost:5010/api/predict/latest?altitude=500' `
 
 ---
 
-## Error Responses
+## Response Error
 
 ### 400 Bad Request
 ```json
@@ -372,9 +373,9 @@ Invoke-RestMethod -Uri 'http://localhost:5010/api/predict/latest?altitude=500' `
 
 ---
 
-## Supported Crops
+## Tanaman yang Didukung
 
-The prediction system can identify the following crops based on soil conditions and altitude:
+Sistem prediksi dapat mengidentifikasi tanaman berikut berdasarkan kondisi tanah dan ketinggian:
 
 1. apple
 2. banana
@@ -401,12 +402,12 @@ The prediction system can identify the following crops based on soil conditions 
 
 ---
 
-## Altitude Rules
+## Aturan Ketinggian
 
-The system filters crop recommendations based on altitude suitability:
+Sistem memfilter rekomendasi tanaman berdasarkan kesesuaian ketinggian:
 
-| Crop | Min Altitude (m) | Max Altitude (m) |
-|------|------------------|------------------|
+| Tanaman | Ketinggian Min (m) | Ketinggian Max (m) |
+|---------|--------------------|--------------------|
 | apple | 1000 | 2500 |
 | banana | 0 | 1000 |
 | coconut | 0 | 600 |
@@ -417,10 +418,59 @@ The system filters crop recommendations based on altitude suitability:
 
 ---
 
-## Notes
+## Catatan
 
-- All authenticated endpoints require a valid JWT token in the `Authorization` header
-- Token format: `Bearer <token>`
-- Token expires after 24 hours
-- The prediction system uses a hybrid approach: ML model + rule-based altitude filtering
-- Altitude filtering ensures only suitable crops for the given elevation are recommended
+- Semua endpoint yang memerlukan autentikasi membutuhkan token JWT valid di header `Authorization`
+- Format token: `Bearer <token>`
+- Token kadaluarsa setelah 24 jam
+- Sistem prediksi menggunakan pendekatan hybrid: Model ML + filtering berbasis aturan ketinggian
+- Filtering ketinggian memastikan hanya tanaman yang cocok untuk elevasi tertentu yang direkomendasikan
+
+---
+
+## Daftar API Tersedia
+
+### Autentikasi
+| Method | Endpoint | Deskripsi | Auth Required |
+|--------|----------|-----------|---------------|
+| POST | `/api/auth/register` | Registrasi user baru | ❌ |
+| POST | `/api/auth/login` | Login user | ❌ |
+| GET | `/api/auth/profile` | Dapatkan profile user | ✅ |
+
+### Data Sensor
+| Method | Endpoint | Deskripsi | Auth Required |
+|--------|----------|-----------|---------------|
+| GET | `/api/sensor/latest` | Dapatkan data sensor terbaru dari MQTT | ❌ |
+| GET | `/api/health` | Cek status kesehatan API dan MQTT | ❌ |
+
+### Prediksi Tanaman
+| Method | Endpoint | Deskripsi | Auth Required |
+|--------|----------|-----------|---------------|
+| POST | `/api/predict` | Prediksi tanaman dengan data custom (N, P, K, temperature, humidity, pH, altitude) | ✅ |
+| GET | `/api/predict/latest` | Prediksi tanaman menggunakan data sensor terbaru (dengan parameter altitude opsional) | ✅ |
+
+### Parameter Prediksi
+**Wajib:**
+- `N` - Level Nitrogen
+- `P` - Level Phosphorus
+- `K` - Level Potassium
+- `temperature` - Suhu (°C)
+- `humidity` - Kelembaban (%)
+- `pH` - pH Tanah
+
+**Opsional:**
+- `altitude` - Ketinggian (meter, default: 0)
+
+### Cara Mendapatkan Token
+1. Registrasi user dengan `POST /api/auth/register`
+2. Login dengan `POST /api/auth/login`
+3. Gunakan token dari response login di header: `Authorization: Bearer <token>`
+4. Token berlaku selama 24 jam
+
+### Contoh Workflow
+```
+1. Registrasi → POST /api/auth/register
+2. Login → POST /api/auth/login (dapatkan token)
+3. Cek sensor → GET /api/sensor/latest
+4. Prediksi → POST /api/predict atau GET /api/predict/latest?altitude=500
+```
