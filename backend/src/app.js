@@ -16,6 +16,15 @@ app.use('/api', sensorRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api', predictionRoutes);
 
+// Health check endpoint (for Docker healthcheck)
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
+    });
+});
+
 // Root endpoint
 app.get('/', (req, res) => {
     res.json({
@@ -23,7 +32,7 @@ app.get('/', (req, res) => {
         version: '1.0.0',
         endpoints: {
             sensor: '/api/sensor/latest',
-            health: '/api/health',
+            health: '/health',
             auth: {
                 register: '/api/auth/register',
                 login: '/api/auth/login',

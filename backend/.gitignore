@@ -12,3 +12,13 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# Docker
+*.sql
+backup_*.sql
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
