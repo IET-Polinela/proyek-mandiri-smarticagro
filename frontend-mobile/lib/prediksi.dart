@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logging/logging.dart';
 import 'package:logging_appenders/logging_appenders.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'services/websocket_service.dart';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PROFESSIONAL COLOR SCHEME - TEAL, NAVY & GRAY
@@ -44,11 +45,15 @@ class CropPredictionPage extends StatefulWidget {
 
 class _CropPredictionPageState extends State<CropPredictionPage>
     with TickerProviderStateMixin {
-
   // ── Konstanta API ────────────────────────────────────────────────────────
-  static const _pythonSensorApiUrl = 'http://103.151.63.79:5011/api/sensor/latest';
-  static const _predictUrl = 'http://103.151.63.79:5011/predict';
+  static const _pythonSensorApiUrl =
+      'http://103.151.63.79:5011/api/sensor/latest';
+  static const _predictUrl = 'http://103.151.63.79:5011/api/predict';
+  static const _websocketUrl = 'http://103.151.63.79:5011';
   static const _pollInterval = Duration(seconds: 5);
+
+  // ── Services ─────────────────────────────────────────────────────────────
+  final _websocketService = WebSocketService();
 
   // ── Controller & State ───────────────────────────────────────────────────
   late final List<TextEditingController> _controllers;
@@ -65,6 +70,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
   final _logger = Logger('CropPrediction');
   int _sensorFailedCount = 0;
   String _mqttStatus = 'LOADING';
+  String? _authToken;
 
   // ── Animation Controllers ─────────────────────────────────────────────────
   late final AnimationController _pulseCtrl;
@@ -126,7 +132,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
     super.initState();
     _controllers = List.generate(
       _sensors.length + 3, // 6 sensor + lat + lon + address
-          (index) => TextEditingController(),
+      (index) => TextEditingController(),
     );
     _controllers[_sensors.length + 2].text = 'Menunggu data lokasi...';
 
@@ -141,14 +147,14 @@ class _CropPredictionPageState extends State<CropPredictionPage>
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
-    _pulseAnim = Tween<double>(begin: 0.98, end: 1.02).animate(
-        CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
+    _pulseAnim = Tween<double>(begin: 0.98, end: 1.02)
+        .animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
     _scaleCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    _scaleAnim = Tween<double>(begin: 1.0, end: 0.95).animate(
-        CurvedAnimation(parent: _scaleCtrl, curve: Curves.easeInOut));
+    _scaleAnim = Tween<double>(begin: 1.0, end: 0.95)
+        .animate(CurvedAnimation(parent: _scaleCtrl, curve: Curves.easeInOut));
     _bounceCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2000),
@@ -160,6 +166,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
   @override
   void dispose() {
     _sensorTimer?.cancel();
+    _websocketService.disconnect();
     _pulseCtrl.dispose();
     _scaleCtrl.dispose();
     _bounceCtrl.dispose();
@@ -180,8 +187,8 @@ class _CropPredictionPageState extends State<CropPredictionPage>
     try {
       final service = await Geolocator.isLocationServiceEnabled();
       if (!service) {
-        _showSnackBar('Aktifkan layanan lokasi (GPS) terlebih dahulu',
-            AppColors.warning,
+        _showSnackBar(
+            'Aktifkan layanan lokasi (GPS) terlebih dahulu', AppColors.warning,
             icon: Icons.location_disabled);
         setState(() => _isLoadingLocation = false);
         return;
@@ -189,16 +196,16 @@ class _CropPredictionPageState extends State<CropPredictionPage>
 
       final status = await Permission.location.request();
       if (status.isDenied) {
-        _showSnackBar('Izin lokasi diperlukan untuk deteksi lahan',
-            AppColors.warning,
+        _showSnackBar(
+            'Izin lokasi diperlukan untuk deteksi lahan', AppColors.warning,
             icon: Icons.location_off);
         setState(() => _isLoadingLocation = false);
         return;
       }
 
       if (status.isPermanentlyDenied) {
-        _showSnackBar('Buka pengaturan untuk memberikan izin lokasi',
-            AppColors.error,
+        _showSnackBar(
+            'Buka pengaturan untuk memberikan izin lokasi', AppColors.error,
             icon: Icons.settings,
             action: SnackBarAction(
                 label: 'Buka',
@@ -218,7 +225,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
   Future<void> _getCurrentLocation() async {
     try {
       final pos = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high)
+              desiredAccuracy: LocationAccuracy.high)
           .timeout(const Duration(seconds: 10));
 
       final latCtrl = _controllers[_sensors.length];
@@ -228,19 +235,17 @@ class _CropPredictionPageState extends State<CropPredictionPage>
       latCtrl.text = pos.latitude.toStringAsFixed(6);
       lonCtrl.text = pos.longitude.toStringAsFixed(6);
 
-      final resp = await http
-          .get(
+      final resp = await http.get(
         Uri.parse(
             'https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.latitude}&lon=${pos.longitude}&zoom=18&addressdetails=1'),
         headers: {'User-Agent': 'SmartCropApp/1.0'},
-      )
-          .timeout(const Duration(seconds: 5));
+      ).timeout(const Duration(seconds: 5));
 
       if (resp.statusCode == 200) {
         final data = jsonDecode(resp.body);
         addrCtrl.text = data['display_name'] ?? 'Lokasi tidak diketahui';
-        _showSnackBar(
-            'Lokasi lahan ditemukan!', AppColors.success, icon: Icons.check_circle);
+        _showSnackBar('Lokasi lahan ditemukan!', AppColors.success,
+            icon: Icons.check_circle);
       } else {
         addrCtrl.text = 'Lat: ${latCtrl.text}, Lon: ${lonCtrl.text}';
       }
@@ -257,9 +262,9 @@ class _CropPredictionPageState extends State<CropPredictionPage>
 
   void _showManualLocationDialog() {
     final latCtrl =
-    TextEditingController(text: _controllers[_sensors.length].text);
+        TextEditingController(text: _controllers[_sensors.length].text);
     final lonCtrl =
-    TextEditingController(text: _controllers[_sensors.length + 1].text);
+        TextEditingController(text: _controllers[_sensors.length + 1].text);
 
     showDialog(
       context: context,
@@ -273,7 +278,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
               decoration: const InputDecoration(
                   labelText: 'Latitude', prefixIcon: Icon(Icons.north)),
               keyboardType:
-              const TextInputType.numberWithOptions(decimal: true),
+                  const TextInputType.numberWithOptions(decimal: true),
             ),
             const SizedBox(height: 12),
             TextField(
@@ -281,7 +286,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
               decoration: const InputDecoration(
                   labelText: 'Longitude', prefixIcon: Icon(Icons.east)),
               keyboardType:
-              const TextInputType.numberWithOptions(decimal: true),
+                  const TextInputType.numberWithOptions(decimal: true),
             ),
           ],
         ),
@@ -293,7 +298,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
               _controllers[_sensors.length].text = latCtrl.text;
               _controllers[_sensors.length + 1].text = lonCtrl.text;
               _controllers[_sensors.length + 2].text =
-              'Lokasi Manual: ${latCtrl.text}, ${lonCtrl.text}';
+                  'Lokasi Manual: ${latCtrl.text}, ${lonCtrl.text}';
               Navigator.pop(ctx);
               setState(() {});
             },
@@ -304,11 +309,73 @@ class _CropPredictionPageState extends State<CropPredictionPage>
     );
   }
 
-  // ── Sensor Polling ──────────────────────────────────────────────────────
+  // ── Sensor Real-time (WebSocket) ────────────────────────────────────────
   void _startSensorPolling() {
-    _sensorTimer = Timer.periodic(
-        _pollInterval, (Timer timer) => _fetchSensorData(isBackground: true));
+    // Connect to WebSocket for real-time data
+    _websocketService.connect(_websocketUrl);
+
+    // Add listener for real-time sensor updates
+    _websocketService.addSensorDataListener(_onSensorDataReceived);
+
+    // Initial fetch via HTTP
     _fetchSensorData(isBackground: false);
+  }
+
+  void _onSensorDataReceived(Map<String, dynamic> data) {
+    if (_showResult || !mounted) return;
+
+    try {
+      _logger.info('Real-time sensor data received via WebSocket');
+
+      // Update MQTT status
+      _mqttStatus = data['status_mqtt'] ?? 'UNKNOWN';
+
+      // Parse GPS
+      if (data['lat'] != null && data['lon'] != null) {
+        final apiLat = (data['lat'] is num)
+            ? (data['lat'] as num).toDouble()
+            : double.tryParse(data['lat']?.toString() ?? '0') ?? 0.0;
+        final apiLon = (data['lon'] is num)
+            ? (data['lon'] as num).toDouble()
+            : double.tryParse(data['lon']?.toString() ?? '0') ?? 0.0;
+
+        if (apiLat != 0.0 && apiLon != 0.0) {
+          _controllers[_sensors.length].text = apiLat.toStringAsFixed(6);
+          _controllers[_sensors.length + 1].text = apiLon.toStringAsFixed(6);
+          _reverseGeocodeSensorGPS(apiLat, apiLon);
+        }
+      }
+
+      // Update sensor values
+      if (mounted) {
+        setState(() {
+          for (int i = 0; i < _sensors.length; i++) {
+            final sensorKey = _sensors[i]['key'] as String;
+            final dynamic rawValue = data[sensorKey];
+
+            double value = 0.0;
+            if (rawValue is num) {
+              value = rawValue.toDouble();
+            } else if (rawValue is String) {
+              value = double.tryParse(rawValue) ?? 0.0;
+            }
+
+            // Format sesuai tipe sensor
+            if (sensorKey == 'pH') {
+              _controllers[i].text = value.toStringAsFixed(2);
+            } else if (sensorKey == 'temperature' || sensorKey == 'humidity') {
+              _controllers[i].text = value.toStringAsFixed(1);
+            } else {
+              _controllers[i].text = value.toStringAsFixed(1);
+            }
+          }
+          _isLoadingSensor = false;
+          _sensorFailedCount = 0;
+        });
+      }
+    } catch (e) {
+      _logger.warning('Error processing WebSocket sensor data: $e');
+    }
   }
 
   Future<void> _fetchSensorData({bool isBackground = false}) async {
@@ -343,7 +410,8 @@ class _CropPredictionPageState extends State<CropPredictionPage>
             final sensorKey = _sensors[i]['key'] as String;
             final dynamic rawValue = data[sensorKey];
 
-            _logger.info('Processing sensor $sensorKey with value: $rawValue (${rawValue.runtimeType})');
+            _logger.info(
+                'Processing sensor $sensorKey with value: $rawValue (${rawValue.runtimeType})');
 
             double value = 0.0;
             if (rawValue is num) {
@@ -361,7 +429,8 @@ class _CropPredictionPageState extends State<CropPredictionPage>
               _controllers[i].text = value.toStringAsFixed(1);
             }
 
-            _logger.info('Updated controller[$i] (${_sensors[i]['label']}): ${_controllers[i].text}');
+            _logger.info(
+                'Updated controller[$i] (${_sensors[i]['label']}): ${_controllers[i].text}');
           }
 
           final apiLat = data['lat'] is num
@@ -402,13 +471,11 @@ class _CropPredictionPageState extends State<CropPredictionPage>
   Future<void> _reverseGeocodeSensorGPS(double lat, double lon) async {
     final addrCtrl = _controllers[_sensors.length + 2];
     try {
-      final resp = await http
-          .get(
+      final resp = await http.get(
         Uri.parse(
             'https://nominatim.openstreetmap.org/reverse?format=json&lat=$lat&lon=$lon&zoom=18&addressdetails=1'),
         headers: {'User-Agent': 'SmartCropApp/1.0'},
-      )
-          .timeout(const Duration(seconds: 5));
+      ).timeout(const Duration(seconds: 5));
 
       if (resp.statusCode == 200) {
         final data = jsonDecode(resp.body);
@@ -416,14 +483,14 @@ class _CropPredictionPageState extends State<CropPredictionPage>
         if (mounted) {
           setState(() {
             addrCtrl.text =
-            'Data Sensor GPS: $displayName (Lat $lat, Lon $lon)';
+                'Data Sensor GPS: $displayName (Lat $lat, Lon $lon)';
           });
         }
       } else {
         if (mounted) {
           setState(() {
             addrCtrl.text =
-            'Data Sensor GPS: Lat ${lat.toStringAsFixed(6)}, Lon ${lon.toStringAsFixed(6)}';
+                'Data Sensor GPS: Lat ${lat.toStringAsFixed(6)}, Lon ${lon.toStringAsFixed(6)}';
           });
         }
       }
@@ -432,7 +499,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
       if (mounted) {
         setState(() {
           addrCtrl.text =
-          'Data Sensor GPS: Lat ${lat.toStringAsFixed(6)}, Lon ${lon.toStringAsFixed(6)}';
+              'Data Sensor GPS: Lat ${lat.toStringAsFixed(6)}, Lon ${lon.toStringAsFixed(6)}';
         });
       }
     }
@@ -459,6 +526,15 @@ class _CropPredictionPageState extends State<CropPredictionPage>
           icon: Icons.location_off);
     }
 
+    // Get auth token
+    final prefs = await SharedPreferences.getInstance();
+    _authToken = prefs.getString('token');
+
+    if (_authToken == null || _authToken!.isEmpty) {
+      return _showSnackBar('Silakan login terlebih dahulu', AppColors.warning,
+          icon: Icons.login);
+    }
+
     setState(() => _isPredicting = true);
     _scaleCtrl.forward().then((_) => _scaleCtrl.reverse());
 
@@ -473,54 +549,77 @@ class _CropPredictionPageState extends State<CropPredictionPage>
 
       final resp = await http
           .post(
-        Uri.parse(_predictUrl),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(body),
-      )
+            Uri.parse(_predictUrl),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $_authToken',
+            },
+            body: jsonEncode(body),
+          )
           .timeout(const Duration(seconds: 10));
 
+      _logger.info('Prediction response status: ${resp.statusCode}');
+      _logger.info('Prediction response body: ${resp.body}');
+
       if (resp.statusCode == 200) {
-        final data = jsonDecode(resp.body) as Map<String, dynamic>;
-        _logger.info('Prediction response: $data');
+        final response = jsonDecode(resp.body) as Map<String, dynamic>;
 
-        // Backend mengirim: prediction, confidence, second_prediction, second_confidence, third_prediction, third_confidence
-        final String prediction = data['prediction']?.toString() ?? 'Unknown';
-        final double confidence = _parseDouble(data['confidence']);
-        final String secondPrediction = data['second_prediction']?.toString() ?? 'Unknown';
-        final double secondConfidence = _parseDouble(data['second_confidence']);
-        final String thirdPrediction = data['third_prediction']?.toString() ?? 'Unknown';
-        final double thirdConfidence = _parseDouble(data['third_confidence']);
+        // Backend format baru: {status: 'success', data: {prediction, confidence, top_crops: [...]}}
+        if (response['status'] == 'success' && response['data'] != null) {
+          final data = response['data'] as Map<String, dynamic>;
+          final String prediction = data['prediction']?.toString() ?? 'Unknown';
+          final double confidence = _parseDouble(data['confidence']);
 
-        final top1 = {'name': prediction, 'percentage': confidence};
-        final top2 = {'name': secondPrediction, 'percentage': secondConfidence};
-        final top3 = {'name': thirdPrediction, 'percentage': thirdConfidence};
+          // Parse top_crops array if available
+          final topCropsList = <Map<String, dynamic>>[];
+          if (data['top_crops'] != null && data['top_crops'] is List) {
+            final crops = data['top_crops'] as List;
+            for (var crop in crops.take(3)) {
+              topCropsList.add({
+                'name': crop['crop']?.toString() ?? 'Unknown',
+                'percentage': _parseDouble(crop['probability'])
+              });
+            }
+          } else {
+            // Fallback to single prediction
+            topCropsList.add({'name': prediction, 'percentage': confidence});
+          }
 
-        setState(() {
-          _topCrops = [top1, top2, top3];
-          _showResult = true;
-        });
+          setState(() {
+            _topCrops = topCropsList;
+            _showResult = true;
+          });
 
-        final entry = <String, dynamic>{
-          ...body.map((k, v) => MapEntry(k, v.toStringAsFixed(1))),
-          'Latitude': lat,
-          'Longitude': lon,
-          'Address': _controllers[_sensors.length + 2].text,
-          'Prediction': prediction,
-          'Confidence': confidence.toStringAsFixed(1),
-          'timestamp': DateTime.now().toIso8601String(),
-        };
+          final entry = <String, dynamic>{
+            ...body.map((k, v) => MapEntry(k, v.toStringAsFixed(1))),
+            'Latitude': lat,
+            'Longitude': lon,
+            'Address': _controllers[_sensors.length + 2].text,
+            'Prediction': prediction,
+            'Confidence': confidence.toStringAsFixed(1),
+            'timestamp': DateTime.now().toIso8601String(),
+          };
 
-        _history.insert(0, entry);
-        _saveHistory();
-        _saveToFirebase(entry);
+          _history.insert(0, entry);
+          _saveHistory();
+          _saveToFirebase(entry);
 
-        _showSnackBar(
-            'Prediksi berhasil: $prediction (${confidence.toStringAsFixed(1)}%)',
-            AppColors.success,
-            icon: Icons.check_circle);
+          _showSnackBar(
+              'Prediksi berhasil: $prediction (${confidence.toStringAsFixed(1)}%)',
+              AppColors.success,
+              icon: Icons.check_circle);
+        } else {
+          _showSnackBar('Format response tidak valid', AppColors.error,
+              icon: Icons.error);
+        }
+      } else if (resp.statusCode == 401) {
+        _showSnackBar('Token expired, silakan login kembali', AppColors.error,
+            icon: Icons.login);
       } else {
-        _showSnackBar('Error server: ${resp.statusCode}', AppColors.error,
-            icon: Icons.error);
+        final errorBody = jsonDecode(resp.body);
+        final errorMsg =
+            errorBody['error'] ?? 'Error server: ${resp.statusCode}';
+        _showSnackBar(errorMsg, AppColors.error, icon: Icons.error);
       }
     } catch (e) {
       _logger.severe('Prediction error: $e');
@@ -536,7 +635,6 @@ class _CropPredictionPageState extends State<CropPredictionPage>
     if (value is String) return double.tryParse(value) ?? 0.0;
     return 0.0;
   }
-
 
   // ── History & Firebase ─────────────────────────────────────────────────
   Future<void> _saveHistory() async {
@@ -562,7 +660,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
         for (var s in _sensors)
           if (entry.containsKey(s['key']))
             s['key'] as String:
-            double.tryParse(entry[s['key']] as String) ?? 0.0,
+                double.tryParse(entry[s['key']] as String) ?? 0.0,
         'timestamp': FieldValue.serverTimestamp(),
       });
     } catch (e) {
@@ -665,7 +763,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child:
-                    Icon(sensor['icon'], color: sensor['color'], size: 24),
+                        Icon(sensor['icon'], color: sensor['color'], size: 24),
                   ),
                   const SizedBox(height: 12),
                   Text(
@@ -755,7 +853,9 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
-                            hasLocation ? Icons.location_on : Icons.location_off,
+                            hasLocation
+                                ? Icons.location_on
+                                : Icons.location_off,
                             color: Colors.white,
                             size: 22),
                       ),
@@ -791,7 +891,8 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                       ),
                       if (hasLocation && !_isLoadingLocation)
                         IconButton(
-                          icon: const Icon(Icons.refresh, color: Colors.white70),
+                          icon:
+                              const Icon(Icons.refresh, color: Colors.white70),
                           onPressed: _requestPermissionsAndLocation,
                           tooltip: 'Update Lokasi',
                         )
@@ -880,7 +981,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                   const SizedBox(height: 8),
                   Container(
                     padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: statusColor.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(6),
@@ -1003,7 +1104,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                   ),
                   Container(
                     padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: AppColors.success.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
@@ -1050,11 +1151,11 @@ class _CropPredictionPageState extends State<CropPredictionPage>
               onPressed: _isPredicting ? null : _predictCrop,
               icon: _isPredicting
                   ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                    color: Colors.white, strokeWidth: 2),
-              )
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2),
+                    )
                   : const Icon(Icons.auto_awesome, size: 22),
               label: Text(
                 _isPredicting ? 'Menganalisis Data...' : 'Prediksi Sekarang',
@@ -1115,12 +1216,12 @@ class _CropPredictionPageState extends State<CropPredictionPage>
               const Spacer(),
               Container(
                 padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: statusColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                      color: statusColor.withOpacity(0.2), width: 1),
+                  border:
+                      Border.all(color: statusColor.withOpacity(0.2), width: 1),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -1299,8 +1400,8 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                     ),
                     IconButton(
                       onPressed: _exportHistory,
-                      icon: const Icon(Icons.download,
-                          color: AppColors.primary),
+                      icon:
+                          const Icon(Icons.download, color: AppColors.primary),
                       tooltip: 'Ekspor',
                     ),
                   ],
@@ -1309,71 +1410,71 @@ class _CropPredictionPageState extends State<CropPredictionPage>
               Expanded(
                 child: _history.isEmpty
                     ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.inbox,
-                          size: 48,
-                          color: AppColors.textHint.withOpacity(0.5)),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Belum ada riwayat prediksi',
-                        style: TextStyle(
-                            color: AppColors.textLight, fontSize: 14),
-                      ),
-                    ],
-                  ),
-                )
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.inbox,
+                                size: 48,
+                                color: AppColors.textHint.withOpacity(0.5)),
+                            const SizedBox(height: 12),
+                            const Text(
+                              'Belum ada riwayat prediksi',
+                              style: TextStyle(
+                                  color: AppColors.textLight, fontSize: 14),
+                            ),
+                          ],
+                        ),
+                      )
                     : ListView.builder(
-                  controller: ctrl,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: _history.length,
-                  itemBuilder: (_, i) {
-                    final h = _history[i];
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                            color: AppColors.border, width: 1),
-                        borderRadius: BorderRadius.circular(12),
+                        controller: ctrl,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: _history.length,
+                        itemBuilder: (_, i) {
+                          final h = _history[i];
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              border:
+                                  Border.all(color: AppColors.border, width: 1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: ListTile(
+                              leading: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(Icons.eco,
+                                    color: AppColors.primary, size: 20),
+                              ),
+                              title: Text(
+                                h['Prediction'] ?? '-',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textDark,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              subtitle: Text(
+                                '${h['Confidence'] ?? '-'}% • ${h['temperature'] ?? '-'}°C • ${h['humidity'] ?? '-'}% • ${h['timestamp']?.substring(0, 16) ?? '-'}',
+                                style: const TextStyle(
+                                  color: AppColors.textLight,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.share,
+                                    color: AppColors.primary, size: 20),
+                                onPressed: _exportHistory,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 4),
+                            ),
+                          );
+                        },
                       ),
-                      child: ListTile(
-                        leading: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Icon(Icons.eco,
-                              color: AppColors.primary, size: 20),
-                        ),
-                        title: Text(
-                          h['Prediction'] ?? '-',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textDark,
-                            fontSize: 14,
-                          ),
-                        ),
-                        subtitle: Text(
-                          '${h['Confidence'] ?? '-'}% • ${h['temperature'] ?? '-'}°C • ${h['humidity'] ?? '-'}% • ${h['timestamp']?.substring(0, 16) ?? '-'}',
-                          style: const TextStyle(
-                            color: AppColors.textLight,
-                            fontSize: 12,
-                          ),
-                        ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.share,
-                              color: AppColors.primary, size: 20),
-                          onPressed: _exportHistory,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 4),
-                      ),
-                    );
-                  },
-                ),
               ),
             ],
           ),

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/prediction_models.dart';
 import '../constants/app_constants.dart';
 
@@ -33,10 +34,21 @@ class SensorService {
 class PredictionService {
   Future<PredictionResult?> predict(Map<String, double> sensorData) async {
     try {
+      // Get auth token
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null || token.isEmpty) {
+        throw Exception('No auth token available');
+      }
+
       final response = await http
           .post(
             Uri.parse(AppConstants.predictUrl),
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
             body: jsonEncode(sensorData),
           )
           .timeout(const Duration(seconds: 10));

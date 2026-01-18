@@ -144,6 +144,34 @@ class SensorMonitoringWidget extends StatelessWidget {
         'icon': Icons.science,
         'color': AppColors.primary
       },
+      {
+        'label': 'Latitude',
+        'value': data.latitude,
+        'unit': '°',
+        'icon': Icons.explore,
+        'color': AppColors.secondary
+      },
+      {
+        'label': 'Longitude',
+        'value': data.longitude,
+        'unit': '°',
+        'icon': Icons.explore_outlined,
+        'color': AppColors.secondary
+      },
+      {
+        'label': 'Altitude',
+        'value': data.altitude,
+        'unit': 'm',
+        'icon': Icons.terrain,
+        'color': AppColors.warning
+      },
+      {
+        'label': 'Satelit',
+        'value': data.satellites.toDouble(),
+        'unit': '',
+        'icon': Icons.satellite_alt,
+        'color': AppColors.accent
+      },
     ];
 
     return GridView.builder(

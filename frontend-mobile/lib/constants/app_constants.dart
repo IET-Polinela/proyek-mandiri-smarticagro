@@ -29,7 +29,8 @@ class AppColors {
 // API Endpoints
 class AppConstants {
   static const String sensorApiUrl = 'http://localhost:5010/api/sensor/latest';
-  static const String predictUrl = 'http://localhost:5000/predict';
+  static const String predictUrl = 'http://localhost:5010/api/predict';
+  static const String websocketUrl = 'http://localhost:5010';
   static const Duration pollInterval = Duration(seconds: 5);
   static const int maxFailedAttempts = 3;
 }

@@ -8,6 +8,7 @@ import '../services/sensor_service.dart';
 import '../services/location_service.dart';
 import '../services/storage_service.dart';
 import '../services/auth_service.dart';
+import '../services/websocket_service.dart';
 import '../widgets/sensor_monitoring_widget.dart';
 import '../widgets/prediction_result_card.dart';
 import '../widgets/history_widget.dart';
@@ -27,6 +28,7 @@ class _DashboardPageState extends State<DashboardPage> {
   final _locationService = LocationService();
   final _storageService = StorageService();
   final _authService = AuthService();
+  final _websocketService = WebSocketService();
 
   // State
   SensorData? _sensorData;
@@ -57,6 +59,7 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void dispose() {
     _sensorTimer?.cancel();
+    _websocketService.disconnect();
     _scrollController.dispose();
     _confettiController.dispose();
     super.dispose();
@@ -64,31 +67,59 @@ class _DashboardPageState extends State<DashboardPage> {
 
   Future<void> _init() async {
     await _loadHistory();
-    _startSensorPolling();
+    _setupWebSocket();
+    _fetchSensorData(); // Initial fetch
     _checkLocationPermission();
   }
 
-  void _startSensorPolling() {
-    // Cancel existing timer
-    _sensorTimer?.cancel();
+  void _setupWebSocket() {
+    // Connect to WebSocket server
+    _websocketService.connect(AppConstants.websocketUrl);
 
-    _fetchSensorData();
-    _sensorTimer = Timer.periodic(
-      AppConstants.pollInterval,
-      (_) => _fetchSensorData(),
-    );
+    // Add listener for real-time sensor data
+    _websocketService.addSensorDataListener(_onSensorDataReceived);
   }
 
+  void _onSensorDataReceived(Map<String, dynamic> data) {
+    if (_showResult || _isPredicting || !mounted) return;
+
+    // Parse sensor data from WebSocket
+    final sensorData = SensorData(
+      n: (data['N'] ?? 0).toDouble(),
+      p: (data['P'] ?? 0).toDouble(),
+      k: (data['K'] ?? 0).toDouble(),
+      temperature: (data['temperature'] ?? 0).toDouble(),
+      humidity: (data['humidity'] ?? 0).toDouble(),
+      pH: (data['pH'] ?? 0).toDouble(),
+      ec: (data['ec'] ?? 0).toDouble(),
+      latitude: (data['lat'] ?? 0).toDouble(),
+      longitude: (data['lon'] ?? 0).toDouble(),
+      altitude: (data['alt'] ?? 0).toDouble(),
+      satellites: (data['sat'] ?? 0).toInt(),
+      timestamp:
+          (data['timestamp'] ?? DateTime.now().millisecondsSinceEpoch / 1000)
+              .toDouble(),
+      mqttStatus: data['status_mqtt'] ?? 'UNKNOWN',
+    );
+
+    if (mounted) {
+      setState(() {
+        _sensorData = sensorData;
+        _lastUpdate = DateTime.now();
+        _isLoadingSensor = false;
+      });
+    }
+  }
+
+  // Fallback HTTP fetch (untuk refresh manual)
   Future<void> _fetchSensorData() async {
     if (_showResult || _isPredicting || !mounted) return;
 
-    // Update loading state tanpa rebuild
     _isLoadingSensor = true;
 
     final data = await _sensorService.fetchLatestSensorData();
 
     if (mounted && !_showResult && !_isPredicting) {
-      // Update semua data sekaligus dalam satu setState untuk menghindari glitch
       setState(() {
         _sensorData = data;
         _lastUpdate = DateTime.now();
@@ -132,6 +163,7 @@ class _DashboardPageState extends State<DashboardPage> {
       'temperature': _sensorData!.temperature,
       'humidity': _sensorData!.humidity,
       'pH': _sensorData!.pH,
+      'altitude': _sensorData!.altitude,
       'rainfall': 200.0, // Default value
     };
 
@@ -309,8 +341,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       result: _predictionResult!,
                       onClose: () {
                         setState(() => _showResult = false);
-                        // Restart polling setelah close result
-                        _startSensorPolling();
+                        // WebSocket akan otomatis continue streaming
                       },
                     ),
                   if (_showResult) const SizedBox(height: 24),
