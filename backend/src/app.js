@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const sensorRoutes = require('./routes/sensor.routes');
 const authRoutes = require('./routes/auth.routes');
 const predictionRoutes = require('./routes/prediction.routes');
@@ -7,9 +9,20 @@ const predictionRoutes = require('./routes/prediction.routes');
 const app = express();
 
 // Middleware
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Rate Limiting
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: { status: 'error', message: 'Terlalu banyak permintaan dari IP ini, silakan coba lagi setelah 15 menit.' }
+});
+
+// Apply rate limiter to all API routes
+app.use('/api', apiLimiter);
 
 // Routes
 app.use('/api', sensorRoutes);
