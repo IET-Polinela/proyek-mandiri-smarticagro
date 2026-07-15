@@ -125,7 +125,9 @@ class _DashboardPageState extends State<DashboardPage>
   void dispose() {
     _pulseCtrl.dispose();
     _websocketService.disconnect();
-    for (var c in _controllers) c.dispose();
+    for (var c in _controllers) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -326,7 +328,7 @@ class _DashboardPageState extends State<DashboardPage>
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: (sensor['color'] as Color).withOpacity(0.1),
+                    color: (sensor['color'] as Color).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(sensor['icon'], color: sensor['color'], size: 24),
@@ -376,7 +378,7 @@ class _DashboardPageState extends State<DashboardPage>
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -437,7 +439,7 @@ class _DashboardPageState extends State<DashboardPage>
                 padding:
                     const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
+                  color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -501,8 +503,9 @@ class _DashboardPageState extends State<DashboardPage>
   }
 
   Widget _buildRecommendationSection() {
-    if (!_showResult || _predictionResult == null)
+    if (!_showResult || _predictionResult == null) {
       return const SizedBox.shrink();
+    }
 
     return Card(
       elevation: 4,
@@ -518,7 +521,7 @@ class _DashboardPageState extends State<DashboardPage>
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(Icons.psychology,
@@ -559,7 +562,7 @@ class _DashboardPageState extends State<DashboardPage>
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: AppColors.success.withOpacity(0.1),
+                    color: AppColors.success.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(

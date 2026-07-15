@@ -26,7 +26,7 @@ class PredictionResultCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   'Hasil Prediksi',
                   style: TextStyle(
                     fontSize: 20,
@@ -36,7 +36,7 @@ class PredictionResultCard extends StatelessWidget {
                 ),
                 if (onClose != null)
                   IconButton(
-                    icon: Icon(Icons.close),
+                    icon: const Icon(Icons.close),
                     onPressed: onClose,
                   ),
               ],
@@ -44,7 +44,7 @@ class PredictionResultCard extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Top 3 Recommendations
-            Text(
+            const Text(
               '3 Rekomendasi Tanaman Terbaik',
               style: TextStyle(
                 fontSize: 18,
@@ -103,15 +103,15 @@ class PredictionResultCard extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            color.withOpacity(isTop ? 0.2 : 0.1),
-            color.withOpacity(isTop ? 0.1 : 0.05),
+            color.withValues(alpha: isTop ? 0.2 : 0.1),
+            color.withValues(alpha: isTop ? 0.1 : 0.05),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
           width: isTop ? 2 : 1,
         ),
       ),
@@ -160,7 +160,7 @@ class PredictionResultCard extends StatelessWidget {
                       color: color,
                     ),
                     const SizedBox(width: 4),
-                    Text(
+                    const Text(
                       'Tingkat kesesuaian',
                       style: TextStyle(
                         fontSize: 12,

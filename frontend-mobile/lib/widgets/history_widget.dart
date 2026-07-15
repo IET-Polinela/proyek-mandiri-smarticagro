@@ -22,7 +22,7 @@ class HistoryWidget extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'Riwayat Prediksi',
               style: TextStyle(
                 fontSize: 18,
@@ -34,13 +34,13 @@ class HistoryWidget extends StatelessWidget {
               children: [
                 if (onExport != null)
                   IconButton(
-                    icon: Icon(Icons.file_download, size: 20),
+                    icon: const Icon(Icons.file_download, size: 20),
                     onPressed: history.isEmpty ? null : onExport,
                     tooltip: 'Export CSV',
                   ),
                 if (onClear != null)
                   IconButton(
-                    icon: Icon(Icons.delete_outline, size: 20),
+                    icon: const Icon(Icons.delete_outline, size: 20),
                     onPressed: history.isEmpty ? null : onClear,
                     tooltip: 'Hapus Riwayat',
                   ),
@@ -50,9 +50,9 @@ class HistoryWidget extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         if (history.isEmpty)
-          Center(
+          const Center(
             child: Padding(
-              padding: const EdgeInsets.all(32),
+              padding: EdgeInsets.all(32),
               child: Column(
                 children: [
                   Icon(
@@ -60,7 +60,7 @@ class HistoryWidget extends StatelessWidget {
                     size: 64,
                     color: AppColors.textHint,
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   Text(
                     'Belum ada riwayat prediksi',
                     style: TextStyle(
@@ -75,7 +75,7 @@ class HistoryWidget extends StatelessWidget {
         else
           ListView.builder(
             shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: history.length > 10 ? 10 : history.length,
             itemBuilder: (context, index) {
               final item = history[index];
@@ -83,8 +83,8 @@ class HistoryWidget extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 8),
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: AppColors.primary.withOpacity(0.1),
-                    child: Icon(
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                    child: const Icon(
                       Icons.agriculture,
                       color: AppColors.primary,
                       size: 20,
@@ -92,19 +92,19 @@ class HistoryWidget extends StatelessWidget {
                   ),
                   title: Text(
                     item.crop.toUpperCase(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       color: AppColors.textDark,
                     ),
                   ),
                   subtitle: Text(
                     '${item.confidence.toStringAsFixed(1)}% • ${_formatDate(item.timestamp)}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.textLight,
                     ),
                   ),
-                  trailing: Icon(
+                  trailing: const Icon(
                     Icons.chevron_right,
                     color: AppColors.textLight,
                   ),
@@ -152,7 +152,7 @@ class HistoryWidget extends StatelessWidget {
                   'Confidence', '${item.confidence.toStringAsFixed(1)}%'),
               _buildInfoRow('Tanggal', _formatDate(item.timestamp)),
               const Divider(height: 24),
-              Text(
+              const Text(
                 'Data Input:',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -170,7 +170,7 @@ class HistoryWidget extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Tutup'),
+            child: const Text('Tutup'),
           ),
         ],
       ),
@@ -185,11 +185,11 @@ class HistoryWidget extends StatelessWidget {
         children: [
           Text(
             label,
-            style: TextStyle(color: AppColors.textLight),
+            style: const TextStyle(color: AppColors.textLight),
           ),
           Text(
             value,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.w600,
               color: AppColors.textDark,
             ),

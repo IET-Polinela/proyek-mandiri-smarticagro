@@ -256,7 +256,7 @@ class _RegisterPageState extends State<RegisterPage>
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  const Color(0xFF4CAF50).withOpacity(0.3),
+                  const Color(0xFF4CAF50).withValues(alpha: 0.3),
                   Colors.transparent,
                 ],
               ),
@@ -273,7 +273,7 @@ class _RegisterPageState extends State<RegisterPage>
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  const Color(0xFF81C784).withOpacity(0.2),
+                  const Color(0xFF81C784).withValues(alpha: 0.2),
                   Colors.transparent,
                 ],
               ),
@@ -289,10 +289,10 @@ class _RegisterPageState extends State<RegisterPage>
       alignment: Alignment.centerLeft,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.1),
+          color: Colors.white.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -329,7 +329,7 @@ class _RegisterPageState extends State<RegisterPage>
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF4CAF50).withOpacity(0.4),
+                color: const Color(0xFF4CAF50).withValues(alpha: 0.4),
                 blurRadius: 25,
                 offset: const Offset(0, 8),
               ),
@@ -366,7 +366,7 @@ class _RegisterPageState extends State<RegisterPage>
           'Buat akun untuk mulai menggunakan',
           style: TextStyle(
             fontSize: responsive.fontSize(14),
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
             letterSpacing: 0.3,
           ),
           textAlign: TextAlign.center,
@@ -383,15 +383,15 @@ class _RegisterPageState extends State<RegisterPage>
         child: Container(
           padding: EdgeInsets.all(responsive.spacing(28)),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(28),
             border: Border.all(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -529,14 +529,14 @@ class _RegisterPageState extends State<RegisterPage>
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
-              color: Colors.white.withOpacity(0.4),
+              color: Colors.white.withValues(alpha: 0.4),
               fontSize: responsive.fontSize(15),
             ),
             prefixIcon: Container(
               margin: const EdgeInsets.only(left: 16, right: 12),
               child: Icon(
                 icon,
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 size: responsive.iconSize(22),
               ),
             ),
@@ -546,7 +546,7 @@ class _RegisterPageState extends State<RegisterPage>
             ),
             suffixIcon: suffixIcon,
             filled: true,
-            fillColor: Colors.white.withOpacity(0.1),
+            fillColor: Colors.white.withValues(alpha: 0.1),
             contentPadding: EdgeInsets.symmetric(
               horizontal: responsive.spacing(20),
               vertical: responsive.spacing(16),
@@ -558,7 +558,7 @@ class _RegisterPageState extends State<RegisterPage>
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),
@@ -612,7 +612,7 @@ class _RegisterPageState extends State<RegisterPage>
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF4CAF50).withOpacity(0.4),
+              color: const Color(0xFF4CAF50).withValues(alpha: 0.4),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -709,7 +709,7 @@ class _BubblePainter extends CustomPainter {
     for (var bubble in bubbles) {
       final y = (bubble.startY + animation * bubble.speed) % 1.2 - 0.1;
       final paint = Paint()
-        ..color = Colors.white.withOpacity(bubble.opacity)
+        ..color = Colors.white.withValues(alpha: bubble.opacity)
         ..style = PaintingStyle.fill;
 
       canvas.drawCircle(

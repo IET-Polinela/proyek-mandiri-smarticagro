@@ -196,7 +196,7 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Smart Crop Prediction'),
+        title: const Text('Smart Crop Prediction'),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -236,7 +236,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                       ),
                       child: _isPredicting
-                          ? SizedBox(
+                          ? const SizedBox(
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
@@ -245,11 +245,11 @@ class _DashboardPageState extends State<DashboardPage> {
                                     AlwaysStoppedAnimation(Colors.white),
                               ),
                             )
-                          : Row(
+                          : const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(Icons.psychology),
-                                const SizedBox(width: 8),
+                                SizedBox(width: 8),
                                 Text(
                                   'Prediksi Tanaman',
                                   style: TextStyle(

@@ -26,7 +26,7 @@ class PredictionResultCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   'Hasil Prediksi',
                   style: TextStyle(
                     fontSize: 20,
@@ -36,7 +36,7 @@ class PredictionResultCard extends StatelessWidget {
                 ),
                 if (onClose != null)
                   IconButton(
-                    icon: Icon(Icons.close),
+                    icon: const Icon(Icons.close),
                     onPressed: onClose,
                   ),
               ],
@@ -47,12 +47,12 @@ class PredictionResultCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.agriculture,
                     size: 48,
                     color: AppColors.primary,
@@ -60,7 +60,7 @@ class PredictionResultCard extends StatelessWidget {
                   const SizedBox(height: 12),
                   Text(
                     result.crop.toUpperCase(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primary,
@@ -69,7 +69,7 @@ class PredictionResultCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     '${result.confidence.toStringAsFixed(1)}% Confidence',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       color: AppColors.textLight,
                     ),
@@ -81,7 +81,7 @@ class PredictionResultCard extends StatelessWidget {
             // Top recommendations
             if (result.topCrops.isNotEmpty) ...[
               const SizedBox(height: 24),
-              Text(
+              const Text(
                 'Rekomendasi Lainnya',
                 style: TextStyle(
                   fontSize: 16,
@@ -97,14 +97,14 @@ class PredictionResultCard extends StatelessWidget {
                       children: [
                         Text(
                           crop.crop,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 14,
                             color: AppColors.textDark,
                           ),
                         ),
                         Text(
                           '${crop.probability.toStringAsFixed(1)}%',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                             color: AppColors.accent,

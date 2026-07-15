@@ -52,8 +52,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) =>
-            isLoggedIn ? const DashboardPage() : const LoginPage(),
+        builder: (_) => isLoggedIn ? const DashboardPage() : const LoginPage(),
       ),
     );
   }
@@ -64,14 +63,14 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [AppColors.primary, AppColors.primaryLight],
           ),
         ),
-        child: SafeArea(
+        child: const SafeArea(
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -81,7 +80,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   size: 80,
                   color: Colors.white,
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
                 Text(
                   'Smart Crop\nPrediction',
                   textAlign: TextAlign.center,
@@ -91,7 +90,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 40),
+                SizedBox(height: 40),
                 CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation(Colors.white),
                 ),

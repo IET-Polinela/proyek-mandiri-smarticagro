@@ -281,7 +281,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  const Color(0xFF4CAF50).withOpacity(0.3),
+                  const Color(0xFF4CAF50).withValues(alpha: 0.3),
                   Colors.transparent,
                 ],
               ),
@@ -298,7 +298,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  const Color(0xFF81C784).withOpacity(0.2),
+                  const Color(0xFF81C784).withValues(alpha: 0.2),
                   Colors.transparent,
                 ],
               ),
@@ -315,10 +315,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
         // Back Button
         Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               width: 1,
             ),
           ),
@@ -355,10 +355,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
         vertical: responsive.spacing(16),
       ),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Colors.white.withOpacity(0.15),
+          color: Colors.white.withValues(alpha: 0.15),
           width: 1,
         ),
       ),
@@ -406,18 +406,20 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
                           ],
                         )
                       : null,
-                  color:
-                      done || isActive ? null : Colors.white.withOpacity(0.1),
+                  color: done || isActive
+                      ? null
+                      : Colors.white.withValues(alpha: 0.1),
                   border: Border.all(
                     color: done || isActive
                         ? Colors.transparent
-                        : Colors.white.withOpacity(0.3),
+                        : Colors.white.withValues(alpha: 0.3),
                     width: 2,
                   ),
                   boxShadow: done || isActive
                       ? [
                           BoxShadow(
-                            color: const Color(0xFF4CAF50).withOpacity(0.4),
+                            color:
+                                const Color(0xFF4CAF50).withValues(alpha: 0.4),
                             blurRadius: 12,
                             offset: const Offset(0, 4),
                           ),
@@ -462,15 +464,15 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
         child: Container(
           padding: EdgeInsets.all(responsive.spacing(24)),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(28),
             border: Border.all(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -530,7 +532,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
             borderRadius: BorderRadius.circular(22),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF4CAF50).withOpacity(0.4),
+                color: const Color(0xFF4CAF50).withValues(alpha: 0.4),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -564,7 +566,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
           'Kami akan mengirim kode verifikasi ke email Anda',
           style: TextStyle(
             fontSize: responsive.fontSize(13),
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
           ),
           textAlign: TextAlign.center,
         ),
@@ -614,7 +616,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
             borderRadius: BorderRadius.circular(22),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF4CAF50).withOpacity(0.4),
+                color: const Color(0xFF4CAF50).withValues(alpha: 0.4),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -648,7 +650,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
           'Kode dikirim ke',
           style: TextStyle(
             fontSize: responsive.fontSize(13),
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
           ),
           textAlign: TextAlign.center,
         ),
@@ -682,12 +684,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
             counterText: '',
             hintText: '------',
             hintStyle: TextStyle(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               fontSize: responsive.fontSize(24),
               letterSpacing: 10,
             ),
             filled: true,
-            fillColor: Colors.white.withOpacity(0.1),
+            fillColor: Colors.white.withValues(alpha: 0.1),
             contentPadding: EdgeInsets.symmetric(
               horizontal: responsive.spacing(16),
               vertical: responsive.spacing(16),
@@ -699,7 +701,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),
@@ -770,7 +772,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
             borderRadius: BorderRadius.circular(22),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF4CAF50).withOpacity(0.4),
+                color: const Color(0xFF4CAF50).withValues(alpha: 0.4),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -804,7 +806,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
           'Buat password baru untuk akun Anda',
           style: TextStyle(
             fontSize: responsive.fontSize(13),
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
           ),
           textAlign: TextAlign.center,
         ),
@@ -900,14 +902,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
-              color: Colors.white.withOpacity(0.4),
+              color: Colors.white.withValues(alpha: 0.4),
               fontSize: responsive.fontSize(14),
             ),
             prefixIcon: Container(
               margin: const EdgeInsets.only(left: 14, right: 10),
               child: Icon(
                 icon,
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 size: responsive.iconSize(20),
               ),
             ),
@@ -917,7 +919,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
             ),
             suffixIcon: suffixIcon,
             filled: true,
-            fillColor: Colors.white.withOpacity(0.1),
+            fillColor: Colors.white.withValues(alpha: 0.1),
             contentPadding: EdgeInsets.symmetric(
               horizontal: responsive.spacing(16),
               vertical: responsive.spacing(14),
@@ -929,7 +931,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),
@@ -970,7 +972,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF4CAF50).withOpacity(0.4),
+              color: const Color(0xFF4CAF50).withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(0, 6),
             ),
@@ -1032,7 +1034,7 @@ class _BubblePainter extends CustomPainter {
     for (var bubble in bubbles) {
       final y = (bubble.startY + animation * bubble.speed) % 1.2 - 0.1;
       final paint = Paint()
-        ..color = Colors.white.withOpacity(bubble.opacity)
+        ..color = Colors.white.withValues(alpha: bubble.opacity)
         ..style = PaintingStyle.fill;
 
       canvas.drawCircle(

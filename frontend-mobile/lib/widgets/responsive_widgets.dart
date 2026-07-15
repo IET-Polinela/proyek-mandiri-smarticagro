@@ -66,7 +66,7 @@ class ResponsiveTextField extends StatelessWidget {
         suffixIcon: suffixIcon,
         counterText: '',
         filled: true,
-        fillColor: Colors.white.withOpacity(0.1),
+        fillColor: Colors.white.withValues(alpha: 0.1),
         contentPadding: EdgeInsets.symmetric(
           horizontal: responsive.horizontalPadding,
           vertical: isSmall ? 12 : 16,
@@ -85,11 +85,12 @@ class ResponsiveTextField extends StatelessWidget {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: constants.AppColors.error),
+          borderSide: const BorderSide(color: constants.AppColors.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: constants.AppColors.error, width: 2),
+          borderSide:
+              const BorderSide(color: constants.AppColors.error, width: 2),
         ),
         errorStyle: TextStyle(
           color: Colors.white,
@@ -231,7 +232,7 @@ class GradientScaffold extends StatelessWidget {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,

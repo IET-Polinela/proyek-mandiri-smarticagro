@@ -162,7 +162,9 @@ class _CropPredictionPageState extends State<CropPredictionPage>
     _pulseCtrl.dispose();
     _scaleCtrl.dispose();
     _bounceCtrl.dispose();
-    for (final c in _controllers) c.dispose();
+    for (final c in _controllers) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -199,7 +201,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
         _showSnackBar(
             'Buka pengaturan untuk memberikan izin lokasi', AppColors.error,
             icon: Icons.settings,
-            action: SnackBarAction(
+            action: const SnackBarAction(
                 label: 'Buka',
                 textColor: Colors.white,
                 onPressed: openAppSettings));
@@ -616,7 +618,9 @@ class _CropPredictionPageState extends State<CropPredictionPage>
     if (status.contains('CONNECTED')) return AppColors.success;
     if (status.contains('DISCONNECTED') ||
         status.contains('FAILED') ||
-        status.contains('FATAL')) return AppColors.error;
+        status.contains('FATAL')) {
+      return AppColors.error;
+    }
     return AppColors.warning;
   }
 
@@ -659,7 +663,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: (sensor['color'] as Color).withOpacity(0.1),
+                      color: (sensor['color'] as Color).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child:
@@ -722,7 +726,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.15),
+                color: AppColors.primary.withValues(alpha: 0.15),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -733,7 +737,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [AppColors.primary, AppColors.primaryDark],
@@ -749,7 +753,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
@@ -805,12 +809,12 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Row(
+                        child: const Row(
                           mainAxisSize: MainAxisSize.min,
-                          children: const [
+                          children: [
                             SizedBox(
                               width: 16,
                               height: 16,
@@ -847,7 +851,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
+                        color: Colors.white.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
@@ -883,9 +887,10 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.2),
+                      color: statusColor.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: statusColor.withOpacity(0.3)),
+                      border:
+                          Border.all(color: statusColor.withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -930,7 +935,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
         color: AppColors.bgWhite,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -946,7 +951,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(Icons.psychology,
@@ -1006,7 +1011,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: AppColors.success.withOpacity(0.1),
+                      color: AppColors.success.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -1070,7 +1075,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
                 elevation: 8,
-                shadowColor: AppColors.primary.withOpacity(0.4),
+                shadowColor: AppColors.primary.withValues(alpha: 0.4),
               ),
             ),
           ),
@@ -1089,10 +1094,10 @@ class _CropPredictionPageState extends State<CropPredictionPage>
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Column(
+              const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Sistem Prediksi',
                     style: TextStyle(
                       fontSize: 28,
@@ -1101,8 +1106,8 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                       letterSpacing: -0.5,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  const Text(
+                  SizedBox(height: 4),
+                  Text(
                     'Analisis Tanaman Cerdas',
                     style: TextStyle(
                       fontSize: 14,
@@ -1118,10 +1123,10 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
+                  color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
-                  border:
-                      Border.all(color: statusColor.withOpacity(0.2), width: 1),
+                  border: Border.all(
+                      color: statusColor.withValues(alpha: 0.2), width: 1),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -1281,7 +1286,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.1),
+                        color: AppColors.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Icon(Icons.history,
@@ -1315,7 +1320,8 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                           children: [
                             Icon(Icons.inbox,
                                 size: 48,
-                                color: AppColors.textHint.withOpacity(0.5)),
+                                color:
+                                    AppColors.textHint.withValues(alpha: 0.5)),
                             const SizedBox(height: 12),
                             const Text(
                               'Belum ada riwayat prediksi',
@@ -1343,7 +1349,8 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                                 width: 40,
                                 height: 40,
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withOpacity(0.1),
+                                  color:
+                                      AppColors.primary.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: const Icon(Icons.eco,

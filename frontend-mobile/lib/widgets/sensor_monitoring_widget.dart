@@ -33,7 +33,7 @@ class SensorMonitoringWidget extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   'Sensor Real-time',
                   style: TextStyle(
                     fontSize: 18,
@@ -52,7 +52,7 @@ class SensorMonitoringWidget extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     IconButton(
-                      icon: Icon(Icons.refresh),
+                      icon: const Icon(Icons.refresh),
                       onPressed: isLoading ? null : onRefresh,
                       iconSize: 20,
                     ),
@@ -63,21 +63,21 @@ class SensorMonitoringWidget extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               'Update: ${_formatTime(lastUpdate)}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12,
                 color: AppColors.textLight,
               ),
             ),
             const SizedBox(height: 16),
             if (isLoading)
-              Center(
+              const Center(
                 child: Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.all(20),
                   child: CircularProgressIndicator(),
                 ),
               )
             else if (sensorData == null)
-              Center(
+              const Center(
                 child: Text(
                   'Tidak ada data sensor',
                   style: TextStyle(color: AppColors.textLight),
@@ -176,8 +176,8 @@ class SensorMonitoringWidget extends StatelessWidget {
 
     return GridView.builder(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
@@ -193,9 +193,9 @@ class SensorMonitoringWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
-                offset: Offset(0, 2),
+                offset: const Offset(0, 2),
               ),
             ],
           ),
@@ -226,7 +226,7 @@ class SensorMonitoringWidget extends StatelessWidget {
                 textBaseline: TextBaseline.alphabetic,
                 children: [
                   Text(
-                    '${(sensor['value'] as double).toStringAsFixed(1)}',
+                    (sensor['value'] as double).toStringAsFixed(1),
                     style: TextStyle(
                       fontSize: valueFontSize.clamp(20.0, 28.0),
                       fontWeight: FontWeight.bold,

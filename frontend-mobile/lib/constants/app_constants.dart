@@ -29,7 +29,7 @@ class AppColors {
 // API Endpoints
 class AppConstants {
   // Production Server
-  static const String baseUrl = 'http://103.151.63.79:5010';
+  static const String baseUrl = 'http://103.151.63.77:5010';
 
   // Development (Localhost)
   // static const String baseUrl = 'http://localhost:5010';

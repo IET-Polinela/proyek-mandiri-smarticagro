@@ -39,7 +39,7 @@ class SensorCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       label,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         color: AppColors.textDark,
@@ -61,7 +61,7 @@ class SensorCard extends StatelessWidget {
               if (unit.isNotEmpty)
                 Text(
                   unit,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.textLight,
                   ),

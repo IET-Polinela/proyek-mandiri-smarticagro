@@ -44,10 +44,10 @@ class _CropPredictionPageState extends State<CropPredictionPage>
     with TickerProviderStateMixin {
   // ── Konstanta API ────────────────────────────────────────────────────────
   static const _pythonSensorApiUrl =
-      'http://103.151.63.79:5010/api/sensor/latest';
+      'http://103.151.63.77:5010/api/sensor/latest';
   static const _predictUrl =
-      'http://103.151.63.79:5010/api/prediction/predict/latest';
-  static const _websocketUrl = 'http://103.151.63.79:5010';
+      'http://103.151.63.77:5010/api/prediction/predict/latest';
+  static const _websocketUrl = 'http://103.151.63.77:5010';
   static const _pollInterval = Duration(seconds: 5);
 
   // ── Services ─────────────────────────────────────────────────────────────
