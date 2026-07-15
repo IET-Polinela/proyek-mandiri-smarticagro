@@ -141,7 +141,9 @@ class PredictionController {
 
                 try {
                     const parsedResult = JSON.parse(result);
-                    res.json({
+                    
+                    // Prepare response for mobile
+                    const response = {
                         ...parsedResult,
                         sensor_data: {
                             N: latestData.N,
@@ -153,7 +155,25 @@ class PredictionController {
                             ec: latestData.ec,
                             timestamp: latestData.timestamp
                         }
-                    });
+                    };
+                    
+                    // Send response to mobile
+                    res.json(response);
+                    
+                    // Publish recommendation to MQTT for ESP32/LCD
+                    if (parsedResult.data && parsedResult.data.top_crops) {
+                        // Ambil top 3 tanaman dengan format crop dan probability
+                        const top3 = parsedResult.data.top_crops
+                            .slice(0, 3)
+                            .map(item => ({
+                                crop: item.crop,
+                                probability: item.probability
+                            }));
+                        
+                        mqttService.publishRecommendation(top3);
+                        console.log('Rekomendasi dipublish ke MQTT:', top3);
+                    }
+                    
                 } catch (parseError) {
                     res.status(500).json({
                         status: 'error',

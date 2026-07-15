@@ -1,8 +1,19 @@
 # Stage 1: Base image with Node.js
 FROM node:18-alpine AS base
 
-# Install Python for ML service
-RUN apk add --no-cache python3 py3-pip
+# Install Python and build dependencies for ML service
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    python3-dev \
+    g++ \
+    gcc \
+    musl-dev \
+    linux-headers \
+    libffi-dev \
+    openblas-dev \
+    lapack-dev \
+    gfortran
 
 # Stage 2: Dependencies
 FROM base AS dependencies
@@ -44,8 +55,16 @@ COPY --from=dependencies /app/node_modules ./node_modules
 # Copy application code
 COPY --chown=nodejs:nodejs . .
 
-# Install Python dependencies for ML service
-RUN pip3 install --no-cache-dir pandas numpy scikit-learn joblib --break-system-packages
+# Install Python dependencies for ML service using Alpine packages (MUCH FASTER!)
+# py3-numpy, py3-pandas, py3-scikit-learn are pre-compiled packages
+RUN apk add --no-cache \
+    py3-numpy \
+    py3-pandas \
+    py3-scikit-learn \
+    && pip3 install --no-cache-dir joblib --break-system-packages
+
+# Clean up build dependencies to reduce image size
+RUN apk del python3-dev g++ gcc musl-dev linux-headers gfortran
 
 # Set user
 USER nodejs

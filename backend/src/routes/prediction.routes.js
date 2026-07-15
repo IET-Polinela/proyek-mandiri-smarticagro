@@ -8,5 +8,6 @@ router.post('/predict', verifyToken, predictionController.predictCrop);
 
 // Predict using latest sensor data from MQTT (protected)
 router.get('/predict/latest', verifyToken, predictionController.predictFromLatestSensor);
+router.post('/predict/latest', verifyToken, predictionController.predictFromLatestSensor);
 
 module.exports = router;

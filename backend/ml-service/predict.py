@@ -101,7 +101,9 @@ def predict_crop(data):
         # -------------------------------
         proba = model.predict_proba(features_scaled)[0]
 
-        top_indices = np.argsort(proba)[::-1][:5]
+        # If altitude > 0, check more candidates for filtering
+        num_candidates = 15 if altitude > 0 else 5
+        top_indices = np.argsort(proba)[::-1][:num_candidates]
         top_crops = [
             {
                 "crop": labels[idx],
@@ -113,10 +115,13 @@ def predict_crop(data):
         # -------------------------------
         # ALTITUDE FILTERING
         # -------------------------------
-        altitude_filtered = filter_by_altitude(top_crops, altitude)
-
-        # fallback if empty
-        final_crops = altitude_filtered if altitude_filtered else top_crops[:3]
+        if altitude > 0:
+            altitude_filtered = filter_by_altitude(top_crops, altitude)
+            # Take top 5 from filtered results
+            final_crops = altitude_filtered[:5] if altitude_filtered else top_crops[:5]
+        else:
+            # No altitude filtering, just return top 5
+            final_crops = top_crops[:5]
 
         result = {
             "status": "success",

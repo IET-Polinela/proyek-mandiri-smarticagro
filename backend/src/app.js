@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/api', sensorRoutes);
 app.use('/api/auth', authRoutes);
-app.use('/api', predictionRoutes);
+app.use('/api/prediction', predictionRoutes);
 
 // Health check endpoint (for Docker healthcheck)
 app.get('/health', (req, res) => {
@@ -39,8 +39,8 @@ app.get('/', (req, res) => {
                 profile: '/api/auth/profile'
             },
             prediction: {
-                predict: '/api/predict (POST, requires token)',
-                predictLatest: '/api/predict/latest (GET, requires token)'
+                predict: '/api/prediction/predict (POST, requires token)',
+                predictLatest: '/api/prediction/predict/latest (GET, requires token)'
             }
         }
     });
