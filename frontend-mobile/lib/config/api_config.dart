@@ -1,5 +1,9 @@
 class ApiConfig {
-  static const String baseUrl = 'http://localhost:5010/api';
+  // Production Server
+  static const String baseUrl = 'http://103.151.63.79:5010/api';
+
+  // Development (Localhost)
+  // static const String baseUrl = 'http://localhost:5010/api';
 
   // Auth endpoints
   static const String login = '$baseUrl/auth/login';

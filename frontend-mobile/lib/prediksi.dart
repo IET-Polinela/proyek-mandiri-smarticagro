@@ -15,30 +15,27 @@ import 'services/websocket_service.dart';
 // PROFESSIONAL COLOR SCHEME - TEAL, NAVY & GRAY
 // ═══════════════════════════════════════════════════════════════════════════
 class AppColors {
-  // Primary Colors
-  static const Color primary = Color(0xFF0D7377); // Professional Teal
+  static const Color primary = Color(0xFF0D7377);
   static const Color primaryLight = Color(0xFF14919B);
   static const Color primaryDark = Color(0xFF084C54);
-  // Secondary Colors
-  static const Color secondary = Color(0xFF2C3E50); // Navy Blue
+  static const Color secondary = Color(0xFF2C3E50);
   static const Color secondaryLight = Color(0xFF34495E);
-  // Accent & Status
-  static const Color accent = Color(0xFF0FA3B1); // Bright Teal Accent
+  static const Color accent = Color(0xFF0FA3B1);
   static const Color success = Color(0xFF27AE60);
   static const Color warning = Color(0xFFF39C12);
   static const Color error = Color(0xFFE74C3C);
-  // Neutrals
-  static const Color textDark = Color(0xFF1F2937); // Dark Gray
-  static const Color textLight = Color(0xFF6B7280); // Medium Gray
-  static const Color textHint = Color(0xFF9CA3AF); // Light Gray
-  static const Color bgLight = Color(0xFFF9FAFB); // Very Light Gray
+  static const Color textDark = Color(0xFF1F2937);
+  static const Color textLight = Color(0xFF6B7280);
+  static const Color textHint = Color(0xFF9CA3AF);
+  static const Color bgLight = Color(0xFFF9FAFB);
   static const Color bgWhite = Color(0xFFFFFFFF);
-  static const Color border = Color(0xFFE5E7EB); // Border Gray
+  static const Color border = Color(0xFFE5E7EB);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 class CropPredictionPage extends StatefulWidget {
   const CropPredictionPage({super.key});
+
   @override
   State<CropPredictionPage> createState() => _CropPredictionPageState();
 }
@@ -47,9 +44,10 @@ class _CropPredictionPageState extends State<CropPredictionPage>
     with TickerProviderStateMixin {
   // ── Konstanta API ────────────────────────────────────────────────────────
   static const _pythonSensorApiUrl =
-      'http://103.151.63.79:5011/api/sensor/latest';
-  static const _predictUrl = 'http://103.151.63.79:5011/api/predict';
-  static const _websocketUrl = 'http://103.151.63.79:5011';
+      'http://103.151.63.79:5010/api/sensor/latest';
+  static const _predictUrl =
+      'http://103.151.63.79:5010/api/prediction/predict/latest';
+  static const _websocketUrl = 'http://103.151.63.79:5010';
   static const _pollInterval = Duration(seconds: 5);
 
   // ── Services ─────────────────────────────────────────────────────────────
@@ -80,49 +78,56 @@ class _CropPredictionPageState extends State<CropPredictionPage>
   late final Animation<double> _scaleAnim;
   late final Animation<double> _bounceAnim;
 
-  // ── Sensor Configuration ───────────────────────
+  // ── Sensor Configuration (ditambah 'ec') ────────────────────────────────
   final List<Map<String, dynamic>> _sensors = [
     {
       'key': 'N',
       'label': 'Nitrogen',
       'icon': Icons.grass,
       'color': AppColors.primary,
-      'unit': ' mg/kg',
+      'unit': ' mg/kg'
     },
     {
       'key': 'P',
       'label': 'Phosphor',
       'icon': Icons.eco,
       'color': AppColors.accent,
-      'unit': ' mg/kg',
+      'unit': ' mg/kg'
     },
     {
       'key': 'K',
       'label': 'Kalium',
       'icon': Icons.spa,
       'color': AppColors.secondary,
-      'unit': ' mg/kg',
+      'unit': ' mg/kg'
     },
     {
       'key': 'temperature',
       'label': 'Suhu',
       'icon': Icons.thermostat,
       'color': AppColors.warning,
-      'unit': '°C',
+      'unit': '°C'
     },
     {
       'key': 'humidity',
       'label': 'Kelembaban',
       'icon': Icons.water_drop,
       'color': AppColors.accent,
-      'unit': '%',
+      'unit': '%'
     },
     {
       'key': 'ph',
       'label': 'pH Tanah',
       'icon': Icons.science,
       'color': AppColors.primary,
-      'unit': '',
+      'unit': ''
+    },
+    {
+      'key': 'ec',
+      'label': 'Konduktivitas Listrik',
+      'icon': Icons.electric_bolt,
+      'color': AppColors.secondary,
+      'unit': ' mS/cm'
     },
   ];
 
@@ -130,10 +135,9 @@ class _CropPredictionPageState extends State<CropPredictionPage>
   @override
   void initState() {
     super.initState();
-    _controllers = List.generate(
-      _sensors.length + 3, // 6 sensor + lat + lon + address
-      (index) => TextEditingController(),
-    );
+    // Controller sekarang 7 sensor + lat + lon + address = 10
+    _controllers =
+        List.generate(_sensors.length + 3, (_) => TextEditingController());
     _controllers[_sensors.length + 2].text = 'Menunggu data lokasi...';
 
     _initAnimations();
@@ -144,21 +148,17 @@ class _CropPredictionPageState extends State<CropPredictionPage>
 
   void _initAnimations() {
     _pulseCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    )..repeat(reverse: true);
+        vsync: this, duration: const Duration(milliseconds: 1500))
+      ..repeat(reverse: true);
     _pulseAnim = Tween<double>(begin: 0.98, end: 1.02)
         .animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
     _scaleCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
+        vsync: this, duration: const Duration(milliseconds: 300));
     _scaleAnim = Tween<double>(begin: 1.0, end: 0.95)
         .animate(CurvedAnimation(parent: _scaleCtrl, curve: Curves.easeInOut));
     _bounceCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2000),
-    )..repeat(reverse: true);
+        vsync: this, duration: const Duration(milliseconds: 2000))
+      ..repeat(reverse: true);
     _bounceAnim = Tween<double>(begin: 0, end: -15).animate(
         CurvedAnimation(parent: _bounceCtrl, curve: Curves.elasticInOut));
   }
@@ -311,13 +311,8 @@ class _CropPredictionPageState extends State<CropPredictionPage>
 
   // ── Sensor Real-time (WebSocket) ────────────────────────────────────────
   void _startSensorPolling() {
-    // Connect to WebSocket for real-time data
     _websocketService.connect(_websocketUrl);
-
-    // Add listener for real-time sensor updates
     _websocketService.addSensorDataListener(_onSensorDataReceived);
-
-    // Initial fetch via HTTP
     _fetchSensorData(isBackground: false);
   }
 
@@ -327,10 +322,8 @@ class _CropPredictionPageState extends State<CropPredictionPage>
     try {
       _logger.info('Real-time sensor data received via WebSocket');
 
-      // Update MQTT status
       _mqttStatus = data['status_mqtt'] ?? 'UNKNOWN';
 
-      // Parse GPS
       if (data['lat'] != null && data['lon'] != null) {
         final apiLat = (data['lat'] is num)
             ? (data['lat'] as num).toDouble()
@@ -346,7 +339,6 @@ class _CropPredictionPageState extends State<CropPredictionPage>
         }
       }
 
-      // Update sensor values
       if (mounted) {
         setState(() {
           for (int i = 0; i < _sensors.length; i++) {
@@ -354,17 +346,18 @@ class _CropPredictionPageState extends State<CropPredictionPage>
             final dynamic rawValue = data[sensorKey];
 
             double value = 0.0;
-            if (rawValue is num) {
+            if (rawValue is num)
               value = rawValue.toDouble();
-            } else if (rawValue is String) {
+            else if (rawValue is String)
               value = double.tryParse(rawValue) ?? 0.0;
-            }
 
             // Format sesuai tipe sensor
-            if (sensorKey == 'pH') {
+            if (sensorKey == 'ph') {
               _controllers[i].text = value.toStringAsFixed(2);
-            } else if (sensorKey == 'temperature' || sensorKey == 'humidity') {
-              _controllers[i].text = value.toStringAsFixed(1);
+            } else if (sensorKey == 'temperature' ||
+                sensorKey == 'humidity' ||
+                sensorKey == 'ec') {
+              _controllers[i].text = value.toStringAsFixed(2);
             } else {
               _controllers[i].text = value.toStringAsFixed(1);
             }
@@ -381,28 +374,21 @@ class _CropPredictionPageState extends State<CropPredictionPage>
   Future<void> _fetchSensorData({bool isBackground = false}) async {
     if (_showResult || !mounted) return;
 
-    if (!isBackground) {
-      setState(() => _isLoadingSensor = true);
-    }
+    if (!isBackground) setState(() => _isLoadingSensor = true);
 
     try {
       final resp = await http
           .get(Uri.parse(_pythonSensorApiUrl))
           .timeout(const Duration(seconds: 10));
-
       if (resp.statusCode != 200) throw Exception('HTTP ${resp.statusCode}');
 
-      _logger.info('Raw API Response: ${resp.body}');
-
       final jsonResponse = jsonDecode(resp.body) as Map<String, dynamic>;
-
       if (jsonResponse['status'] != 'success' ||
           !jsonResponse.containsKey('data')) {
         throw Exception('API Response Format Invalid or Data Empty');
       }
 
       final data = jsonResponse['data'] as Map<String, dynamic>;
-      _logger.info('Parsed data: $data');
 
       if (mounted) {
         setState(() {
@@ -410,27 +396,21 @@ class _CropPredictionPageState extends State<CropPredictionPage>
             final sensorKey = _sensors[i]['key'] as String;
             final dynamic rawValue = data[sensorKey];
 
-            _logger.info(
-                'Processing sensor $sensorKey with value: $rawValue (${rawValue.runtimeType})');
-
             double value = 0.0;
-            if (rawValue is num) {
+            if (rawValue is num)
               value = rawValue.toDouble();
-            } else if (rawValue is String) {
+            else if (rawValue is String)
               value = double.tryParse(rawValue) ?? 0.0;
-            }
 
-            // Format sesuai tipe sensor
             if (sensorKey == 'ph') {
               _controllers[i].text = value.toStringAsFixed(2);
-            } else if (sensorKey == 'temperature' || sensorKey == 'humidity') {
-              _controllers[i].text = value.toStringAsFixed(1);
+            } else if (sensorKey == 'temperature' ||
+                sensorKey == 'humidity' ||
+                sensorKey == 'ec') {
+              _controllers[i].text = value.toStringAsFixed(2);
             } else {
               _controllers[i].text = value.toStringAsFixed(1);
             }
-
-            _logger.info(
-                'Updated controller[$i] (${_sensors[i]['label']}): ${_controllers[i].text}');
           }
 
           final apiLat = data['lat'] is num
@@ -446,7 +426,6 @@ class _CropPredictionPageState extends State<CropPredictionPage>
             _reverseGeocodeSensorGPS(apiLat, apiLon);
           }
 
-          // Update MQTT status dari backend
           _mqttStatus = data['status_mqtt']?.toString() ?? 'UNKNOWN';
         });
       }
@@ -462,9 +441,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
         _sensorFailedCount = 0;
       }
     } finally {
-      if (!isBackground && mounted) {
-        setState(() => _isLoadingSensor = false);
-      }
+      if (!isBackground && mounted) setState(() => _isLoadingSensor = false);
     }
   }
 
@@ -505,14 +482,14 @@ class _CropPredictionPageState extends State<CropPredictionPage>
     }
   }
 
-  // ── Prediction Logic ────────────────────────────────────────────────────
+  // ── Prediction Logic (sudah termasuk 'ec') ────────────────────────────────────
   Future<void> _predictCrop() async {
     if (_controllers[0].text.isEmpty || _controllers[0].text == '0') {
       return _showSnackBar(
-          'Tunggu hingga data sensor (N, P, K, dll.) tersedia dari perangkat.',
-          AppColors.warning,
+          'Tunggu hingga data sensor tersedia.', AppColors.warning,
           icon: Icons.warning);
     }
+
     final lat = _controllers[_sensors.length].text;
     final lon = _controllers[_sensors.length + 1].text;
 
@@ -520,13 +497,10 @@ class _CropPredictionPageState extends State<CropPredictionPage>
         lon.isEmpty ||
         double.tryParse(lat) == null ||
         double.tryParse(lon) == null) {
-      return _showSnackBar(
-          'Lokasi wajib diisi! Klik "Ambil Lokasi" atau input manual.',
-          AppColors.warning,
+      return _showSnackBar('Lokasi wajib diisi!', AppColors.warning,
           icon: Icons.location_off);
     }
 
-    // Get auth token
     final prefs = await SharedPreferences.getInstance();
     _authToken = prefs.getString('token');
 
@@ -541,9 +515,15 @@ class _CropPredictionPageState extends State<CropPredictionPage>
     try {
       final body = <String, double>{};
       for (int i = 0; i < _sensors.length; i++) {
-        body[_sensors[i]['key'] as String] =
-            double.tryParse(_controllers[i].text) ?? 0;
+        final key = _sensors[i]['key'] as String;
+        body[key] = double.tryParse(_controllers[i].text) ?? 0.0;
       }
+
+      // Pastikan 'ec' ada di body
+      body['ec'] = double.tryParse(
+              _controllers[_sensors.indexWhere((s) => s['key'] == 'ec')]
+                  .text) ??
+          0.0;
 
       _logger.info('Sending prediction request with body: $body');
 
@@ -564,13 +544,11 @@ class _CropPredictionPageState extends State<CropPredictionPage>
       if (resp.statusCode == 200) {
         final response = jsonDecode(resp.body) as Map<String, dynamic>;
 
-        // Backend format baru: {status: 'success', data: {prediction, confidence, top_crops: [...]}}
         if (response['status'] == 'success' && response['data'] != null) {
           final data = response['data'] as Map<String, dynamic>;
           final String prediction = data['prediction']?.toString() ?? 'Unknown';
           final double confidence = _parseDouble(data['confidence']);
 
-          // Parse top_crops array if available
           final topCropsList = <Map<String, dynamic>>[];
           if (data['top_crops'] != null && data['top_crops'] is List) {
             final crops = data['top_crops'] as List;
@@ -581,7 +559,6 @@ class _CropPredictionPageState extends State<CropPredictionPage>
               });
             }
           } else {
-            // Fallback to single prediction
             topCropsList.add({'name': prediction, 'percentage': confidence});
           }
 
@@ -591,7 +568,7 @@ class _CropPredictionPageState extends State<CropPredictionPage>
           });
 
           final entry = <String, dynamic>{
-            ...body.map((k, v) => MapEntry(k, v.toStringAsFixed(1))),
+            ...body.map((k, v) => MapEntry(k, v.toStringAsFixed(2))),
             'Latitude': lat,
             'Longitude': lon,
             'Address': _controllers[_sensors.length + 2].text,
@@ -689,17 +666,14 @@ class _CropPredictionPageState extends State<CropPredictionPage>
         children: [
           if (icon != null) ...[
             Icon(icon, color: Colors.white, size: 20),
-            const SizedBox(width: 12)
+            const SizedBox(width: 12),
           ],
           Expanded(
-            child: Text(
-              msg,
-              style: const TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                  color: Colors.white),
-            ),
-          ),
+              child: Text(msg,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                      color: Colors.white))),
         ],
       ),
       backgroundColor: color,
@@ -737,10 +711,9 @@ class _CropPredictionPageState extends State<CropPredictionPage>
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: sensor['color'].withOpacity(0.15),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
+                  color: sensor['color'].withOpacity(0.15),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4))
             ],
           ),
           child: Material(
@@ -759,9 +732,8 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: (sensor['color'] as Color).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                        color: (sensor['color'] as Color).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12)),
                     child:
                         Icon(sensor['icon'], color: sensor['color'], size: 24),
                   ),
@@ -769,11 +741,10 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                   Text(
                     sensor['label'],
                     style: const TextStyle(
-                      color: AppColors.textLight,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 0.3,
-                    ),
+                        color: AppColors.textLight,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.3),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
@@ -781,17 +752,15 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                     Text(
                       value + (sensor['unit'] ?? ''),
                       style: TextStyle(
-                        color: sensor['color'],
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
+                          color: sensor['color'],
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700),
                     )
                   else
                     const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2)),
                 ],
               ),
             ),
@@ -822,10 +791,9 @@ class _CropPredictionPageState extends State<CropPredictionPage>
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.15),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
+                  color: AppColors.primary.withOpacity(0.15),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4))
             ],
           ),
           child: Material(
@@ -834,10 +802,9 @@ class _CropPredictionPageState extends State<CropPredictionPage>
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
                 gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [AppColors.primary, AppColors.primaryDark],
-                ),
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [AppColors.primary, AppColors.primaryDark]),
               ),
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -849,9 +816,8 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12)),
                         child: Icon(
                             hasLocation
                                 ? Icons.location_on
@@ -864,25 +830,21 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Lokasi Lahan',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 0.2,
-                              ),
-                            ),
+                            const Text('Lokasi Lahan',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 0.2)),
                             const SizedBox(height: 4),
                             Text(
                               hasLocation
                                   ? (addr.isNotEmpty ? addr : '$lat, $lon')
                                   : 'Data lokasi diperlukan untuk prediksi akurat.',
                               style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                              ),
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -891,11 +853,10 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                       ),
                       if (hasLocation && !_isLoadingLocation)
                         IconButton(
-                          icon:
-                              const Icon(Icons.refresh, color: Colors.white70),
-                          onPressed: _requestPermissionsAndLocation,
-                          tooltip: 'Update Lokasi',
-                        )
+                            icon: const Icon(Icons.refresh,
+                                color: Colors.white70),
+                            onPressed: _requestPermissionsAndLocation,
+                            tooltip: 'Update Lokasi'),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -905,18 +866,16 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(8)),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: const [
                             SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(
-                                  color: Colors.white, strokeWidth: 2),
-                            ),
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                    color: Colors.white, strokeWidth: 2)),
                             SizedBox(width: 8),
                             Text("Mencari GPS...",
                                 style: TextStyle(
@@ -947,34 +906,26 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                          color: Colors.white.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(8)),
                       child: Row(
                         children: [
                           const Icon(Icons.map, color: Colors.white, size: 14),
                           const SizedBox(width: 8),
-                          Text(
-                            'Lat: $lat | Lon: $lon',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
+                          Text('Lat: $lat | Lon: $lon',
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500)),
                           const Spacer(),
                           GestureDetector(
                             onTap: _showManualLocationDialog,
-                            child: const Text(
-                              "Edit Manual",
-                              style: TextStyle(
-                                color: Colors.white,
-                                decoration: TextDecoration.underline,
-                                decorationColor: Colors.white,
-                                fontSize: 11,
-                              ),
-                            ),
-                          )
+                            child: const Text("Edit Manual",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    decoration: TextDecoration.underline,
+                                    fontSize: 11)),
+                          ),
                         ],
                       ),
                     ),
@@ -983,30 +934,24 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: statusColor.withOpacity(0.3)),
-                    ),
+                        color: statusColor.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(6),
+                        border:
+                            Border.all(color: statusColor.withOpacity(0.3))),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Container(
-                          width: 6,
-                          height: 6,
-                          decoration: BoxDecoration(
-                            color: statusColor,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
+                            width: 6,
+                            height: 6,
+                            decoration: BoxDecoration(
+                                color: statusColor, shape: BoxShape.circle)),
                         const SizedBox(width: 4),
-                        Text(
-                          _mqttStatus,
-                          style: TextStyle(
-                            color: statusColor,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+                        Text(_mqttStatus,
+                            style: TextStyle(
+                                color: statusColor,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500)),
                       ],
                     ),
                   ),
@@ -1020,9 +965,8 @@ class _CropPredictionPageState extends State<CropPredictionPage>
   }
 
   Widget _recommendationsSection() {
-    if (!_showResult || _topCrops.isEmpty) {
-      return const SizedBox.shrink();
-    }
+    if (!_showResult || _topCrops.isEmpty) return const SizedBox.shrink();
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
@@ -1030,10 +974,9 @@ class _CropPredictionPageState extends State<CropPredictionPage>
         color: AppColors.bgWhite,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2))
         ],
       ),
       padding: const EdgeInsets.all(20),
@@ -1046,22 +989,18 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                    color: AppColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10)),
                 child: const Icon(Icons.psychology,
                     color: AppColors.primary, size: 20),
               ),
               const SizedBox(width: 12),
-              const Text(
-                'Rekomendasi Tanaman',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textDark,
-                  letterSpacing: 0.3,
-                ),
-              ),
+              const Text('Rekomendasi Tanaman',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textDark,
+                      letterSpacing: 0.3)),
             ],
           ),
           const SizedBox(height: 16),
@@ -1077,46 +1016,33 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: _getRankColor(index),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                        color: _getRankColor(index),
+                        borderRadius: BorderRadius.circular(8)),
                     child: Center(
-                      child: Text(
-                        '${index + 1}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
+                        child: Text('${index + 1}',
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14))),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Text(
-                      crop['name'],
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textDark,
-                      ),
-                    ),
-                  ),
+                      child: Text(crop['name'],
+                          style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textDark))),
                   Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: AppColors.success.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      '${crop['percentage'].toStringAsFixed(1)}%',
-                      style: const TextStyle(
-                        color: AppColors.success,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                        color: AppColors.success.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8)),
+                    child: Text('${crop['percentage'].toStringAsFixed(1)}%',
+                        style: const TextStyle(
+                            color: AppColors.success,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700)),
                   ),
                 ],
               ),
@@ -1154,16 +1080,14 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2),
-                    )
+                          color: Colors.white, strokeWidth: 2))
                   : const Icon(Icons.auto_awesome, size: 22),
               label: Text(
-                _isPredicting ? 'Menganalisis Data...' : 'Prediksi Sekarang',
-                style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.3),
-              ),
+                  _isPredicting ? 'Menganalisis Data...' : 'Prediksi Sekarang',
+                  style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.3)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
@@ -1192,25 +1116,19 @@ class _CropPredictionPageState extends State<CropPredictionPage>
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Sistem Prediksi',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.textDark,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
+                  const Text('Sistem Prediksi',
+                      style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textDark,
+                          letterSpacing: -0.5)),
                   const SizedBox(height: 4),
-                  const Text(
-                    'Analisis Tanaman Cerdas',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.textLight,
-                      letterSpacing: 0.2,
-                    ),
-                  ),
+                  const Text('Analisis Tanaman Cerdas',
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textLight,
+                          letterSpacing: 0.2)),
                 ],
               ),
               const Spacer(),
@@ -1218,72 +1136,58 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
-                  border:
-                      Border.all(color: statusColor.withOpacity(0.2), width: 1),
-                ),
+                    color: statusColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                        color: statusColor.withOpacity(0.2), width: 1)),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: statusColor,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                            color: statusColor,
+                            borderRadius: BorderRadius.circular(4))),
                     const SizedBox(width: 6),
-                    Text(
-                      _mqttStatus,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: statusColor,
-                        letterSpacing: 0.2,
-                      ),
-                    ),
+                    Text(_mqttStatus,
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: statusColor,
+                            letterSpacing: 0.2)),
                   ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 28),
-          const Text(
-            'Data Sensor',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textDark,
-              letterSpacing: 0.3,
-            ),
-          ),
+          const Text('Data Sensor',
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textDark,
+                  letterSpacing: 0.3)),
           const SizedBox(height: 12),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 1.0,
-            ),
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 1.0),
             itemCount: _sensors.length,
-            itemBuilder: (context, index) {
-              return _sensorCard(_sensors[index], index);
-            },
+            itemBuilder: (context, index) =>
+                _sensorCard(_sensors[index], index),
           ),
           const SizedBox(height: 28),
-          const Text(
-            'Informasi Lokasi',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textDark,
-              letterSpacing: 0.3,
-            ),
-          ),
+          const Text('Informasi Lokasi',
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textDark,
+                  letterSpacing: 0.3)),
           const SizedBox(height: 12),
           _locationCard(),
           const SizedBox(height: 28),
@@ -1306,30 +1210,25 @@ class _CropPredictionPageState extends State<CropPredictionPage>
         elevation: 0,
         backgroundColor: AppColors.bgWhite,
         surfaceTintColor: Colors.transparent,
-        title: const Text(
-          'Smart Crop Prediction',
-          style: TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 18,
-              color: AppColors.textDark,
-              letterSpacing: 0.2),
-        ),
+        title: const Text('Smart Crop Prediction',
+            style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 18,
+                color: AppColors.textDark,
+                letterSpacing: 0.2)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.history, color: AppColors.primary),
-            onPressed: _showHistoryBottomSheet,
-            tooltip: 'Riwayat Prediksi',
-          ),
+              icon: const Icon(Icons.history, color: AppColors.primary),
+              onPressed: _showHistoryBottomSheet,
+              tooltip: 'Riwayat Prediksi'),
           IconButton(
-            icon: const Icon(Icons.refresh, color: AppColors.primary),
-            onPressed: () => _fetchSensorData(isBackground: false),
-            tooltip: 'Refresh Data Sensor',
-          ),
+              icon: const Icon(Icons.refresh, color: AppColors.primary),
+              onPressed: () => _fetchSensorData(isBackground: false),
+              tooltip: 'Refresh Data Sensor'),
         ],
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(color: AppColors.border, height: 1),
-        ),
+            preferredSize: const Size.fromHeight(1),
+            child: Container(color: AppColors.border, height: 1)),
       ),
       body: SafeArea(
         child: Stack(
@@ -1337,12 +1236,10 @@ class _CropPredictionPageState extends State<CropPredictionPage>
             _mainView(),
             if (_isLoadingSensor || _isPredicting)
               Container(
-                color: Colors.black45,
-                child: const Center(
-                  child: CircularProgressIndicator(
-                      color: AppColors.primary, strokeWidth: 3),
-                ),
-              ),
+                  color: Colors.black45,
+                  child: const Center(
+                      child: CircularProgressIndicator(
+                          color: AppColors.primary, strokeWidth: 3))),
           ],
         ),
       ),
@@ -1360,19 +1257,17 @@ class _CropPredictionPageState extends State<CropPredictionPage>
         maxChildSize: 0.9,
         builder: (_, ctrl) => Container(
           decoration: const BoxDecoration(
-            color: AppColors.bgWhite,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
+              color: AppColors.bgWhite,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
           child: Column(
             children: [
               Container(
-                width: 36,
-                height: 4,
-                margin: const EdgeInsets.only(top: 12),
-                decoration: BoxDecoration(
-                    color: AppColors.border,
-                    borderRadius: BorderRadius.circular(2)),
-              ),
+                  width: 36,
+                  height: 4,
+                  margin: const EdgeInsets.only(top: 12),
+                  decoration: BoxDecoration(
+                      color: AppColors.border,
+                      borderRadius: BorderRadius.circular(2))),
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
@@ -1381,29 +1276,23 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                          color: AppColors.primary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10)),
                       child: const Icon(Icons.history,
                           color: AppColors.primary, size: 20),
                     ),
                     const SizedBox(width: 12),
                     const Expanded(
-                      child: Text(
-                        'Riwayat Prediksi',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textDark,
-                        ),
-                      ),
-                    ),
+                        child: Text('Riwayat Prediksi',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textDark))),
                     IconButton(
-                      onPressed: _exportHistory,
-                      icon:
-                          const Icon(Icons.download, color: AppColors.primary),
-                      tooltip: 'Ekspor',
-                    ),
+                        onPressed: _exportHistory,
+                        icon: const Icon(Icons.download,
+                            color: AppColors.primary),
+                        tooltip: 'Ekspor'),
                   ],
                 ),
               ),
@@ -1417,11 +1306,9 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                                 size: 48,
                                 color: AppColors.textHint.withOpacity(0.5)),
                             const SizedBox(height: 12),
-                            const Text(
-                              'Belum ada riwayat prediksi',
-                              style: TextStyle(
-                                  color: AppColors.textLight, fontSize: 14),
-                            ),
+                            const Text('Belum ada riwayat prediksi',
+                                style: TextStyle(
+                                    color: AppColors.textLight, fontSize: 14)),
                           ],
                         ),
                       )
@@ -1434,41 +1321,33 @@ class _CropPredictionPageState extends State<CropPredictionPage>
                           return Container(
                             margin: const EdgeInsets.only(bottom: 12),
                             decoration: BoxDecoration(
-                              border:
-                                  Border.all(color: AppColors.border, width: 1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                                border: Border.all(
+                                    color: AppColors.border, width: 1),
+                                borderRadius: BorderRadius.circular(12)),
                             child: ListTile(
                               leading: Container(
                                 width: 40,
                                 height: 40,
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
+                                    color: AppColors.primary.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(10)),
                                 child: const Icon(Icons.eco,
                                     color: AppColors.primary, size: 20),
                               ),
-                              title: Text(
-                                h['Prediction'] ?? '-',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textDark,
-                                  fontSize: 14,
-                                ),
-                              ),
+                              title: Text(h['Prediction'] ?? '-',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textDark,
+                                      fontSize: 14)),
                               subtitle: Text(
-                                '${h['Confidence'] ?? '-'}% • ${h['temperature'] ?? '-'}°C • ${h['humidity'] ?? '-'}% • ${h['timestamp']?.substring(0, 16) ?? '-'}',
-                                style: const TextStyle(
-                                  color: AppColors.textLight,
-                                  fontSize: 12,
-                                ),
-                              ),
+                                  '${h['Confidence'] ?? '-'}% • ${h['temperature'] ?? '-'}°C • ${h['humidity'] ?? '-'}% • ${h['timestamp']?.substring(0, 16) ?? '-'}',
+                                  style: const TextStyle(
+                                      color: AppColors.textLight,
+                                      fontSize: 12)),
                               trailing: IconButton(
-                                icon: const Icon(Icons.share,
-                                    color: AppColors.primary, size: 20),
-                                onPressed: _exportHistory,
-                              ),
+                                  icon: const Icon(Icons.share,
+                                      color: AppColors.primary, size: 20),
+                                  onPressed: _exportHistory),
                               contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 4),
                             ),

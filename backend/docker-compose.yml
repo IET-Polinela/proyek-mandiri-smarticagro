@@ -25,6 +25,37 @@ services:
       timeout: 5s
       retries: 5
 
+  # ML FastAPI Service
+  ml-service:
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    container_name: sensor_ml_service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    networks:
+      - sensor_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Mosquitto MQTT Broker
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: sensor_mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883" # Bind host port 1883 to container port 1883
+    volumes:
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+    networks:
+      - sensor_network
+
   # Backend API
   backend:
     build:
@@ -47,8 +78,8 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
       
       # MQTT Config
-      MQTT_BROKER: ${MQTT_BROKER}
-      MQTT_PORT: ${MQTT_PORT:-1883}
+      MQTT_BROKER: mosquitto
+      MQTT_PORT: 1883
       MQTT_TOPIC: ${MQTT_TOPIC:-sensor/final}
       
       # JWT Config
@@ -61,6 +92,9 @@ services:
       EMAIL_USER: ${EMAIL_USER}
       EMAIL_PASSWORD: ${EMAIL_PASSWORD}
       EMAIL_FROM: ${EMAIL_FROM}
+      
+      # ML Service Config
+      ML_SERVICE_URL: http://ml-service:8000
     ports:
       - "${SERVER_PORT:-5010}:5010"
     depends_on:
@@ -69,9 +103,6 @@ services:
     networks:
       - sensor_network
     volumes:
-      # Mount ML models and data (read-only)
-      - ./ml-service/models:/app/ml-service/models:ro
-      - ./ml-service/data:/app/ml-service/data:ro
       # Optional: Mount logs directory
       - backend_logs:/app/logs
     healthcheck:
@@ -89,4 +120,8 @@ volumes:
   postgres_data:
     driver: local
   backend_logs:
+    driver: local
+  mosquitto_data:
+    driver: local
+  mosquitto_log:
     driver: local

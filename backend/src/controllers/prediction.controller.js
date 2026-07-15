@@ -1,6 +1,8 @@
-const { PythonShell } = require('python-shell');
+const axios = require('axios');
 const path = require('path');
 const mqttService = require('../services/mqtt.service');
+
+const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
 
 class PredictionController {
     async predictCrop(req, res) {
@@ -29,45 +31,17 @@ class PredictionController {
                 altitude: parseFloat(altitude || 0)
             };
 
-            // Python shell options
-            const options = {
-                mode: 'text',
-                pythonPath: 'python',
-                scriptPath: path.join(__dirname, '../../ml-service'),
-                args: []
-            };
-
-            // Run Python script
-            const pyshell = new PythonShell('predict.py', options);
-            
-            // Send input data
-            pyshell.send(JSON.stringify(inputData));
-
-            let result = '';
-
-            pyshell.on('message', (message) => {
-                result += message;
-            });
-
-            pyshell.end((err) => {
-                if (err) {
-                    console.error('Python error:', err);
-                    return res.status(500).json({
-                        status: 'error',
-                        message: 'Prediction failed. Please check if Python and required packages are installed.'
-                    });
-                }
-
-                try {
-                    const parsedResult = JSON.parse(result);
-                    res.json(parsedResult);
-                } catch (parseError) {
-                    res.status(500).json({
-                        status: 'error',
-                        message: 'Failed to parse prediction result'
-                    });
-                }
-            });
+            // Call FastAPI ML Service
+            try {
+                const response = await axios.post(`${ML_SERVICE_URL}/predict`, inputData);
+                res.json(response.data);
+            } catch (apiError) {
+                console.error('ML API error:', apiError.message);
+                return res.status(500).json({
+                    status: 'error',
+                    message: 'Prediction failed. ML service is unreachable or returned an error.'
+                });
+            }
 
         } catch (error) {
             console.error('Prediction error:', error);
@@ -108,79 +82,51 @@ class PredictionController {
                 temperature: parseFloat(latestData.temperature),
                 humidity: parseFloat(latestData.humidity),
                 pH: parseFloat(latestData.pH),
-                altitude: parseFloat(req.query.altitude || 0) // altitude from query or default 0
+                altitude: parseFloat(req.query.altitude || req.body.altitude || 0) 
             };
 
-            // Python shell options
-            const options = {
-                mode: 'text',
-                pythonPath: 'python',
-                scriptPath: path.join(__dirname, '../../ml-service'),
-                args: []
-            };
-
-            // Run Python script
-            const pyshell = new PythonShell('predict.py', options);
-            
-            pyshell.send(JSON.stringify(inputData));
-
-            let result = '';
-
-            pyshell.on('message', (message) => {
-                result += message;
-            });
-
-            pyshell.end((err) => {
-                if (err) {
-                    console.error('Python error:', err);
-                    return res.status(500).json({
-                        status: 'error',
-                        message: 'Prediction failed'
-                    });
-                }
-
-                try {
-                    const parsedResult = JSON.parse(result);
-                    
-                    // Prepare response for mobile
-                    const response = {
-                        ...parsedResult,
-                        sensor_data: {
-                            N: latestData.N,
-                            P: latestData.P,
-                            K: latestData.K,
-                            temperature: latestData.temperature,
-                            humidity: latestData.humidity,
-                            pH: latestData.pH,
-                            ec: latestData.ec,
-                            timestamp: latestData.timestamp
-                        }
-                    };
-                    
-                    // Send response to mobile
-                    res.json(response);
-                    
-                    // Publish recommendation to MQTT for ESP32/LCD
-                    if (parsedResult.data && parsedResult.data.top_crops) {
-                        // Ambil top 3 tanaman dengan format crop dan probability
-                        const top3 = parsedResult.data.top_crops
-                            .slice(0, 3)
-                            .map(item => ({
-                                crop: item.crop,
-                                probability: item.probability
-                            }));
-                        
-                        mqttService.publishRecommendation(top3);
-                        console.log('Rekomendasi dipublish ke MQTT:', top3);
+            try {
+                const response = await axios.post(`${ML_SERVICE_URL}/predict`, inputData);
+                const parsedResult = response.data;
+                
+                // Prepare response for mobile
+                const finalResponse = {
+                    ...parsedResult,
+                    sensor_data: {
+                        N: latestData.N,
+                        P: latestData.P,
+                        K: latestData.K,
+                        temperature: latestData.temperature,
+                        humidity: latestData.humidity,
+                        pH: latestData.pH,
+                        ec: latestData.ec,
+                        timestamp: latestData.timestamp
                     }
+                };
+                
+                // Send response to mobile
+                res.json(finalResponse);
+                
+                // Publish recommendation to MQTT for ESP32/LCD
+                if (parsedResult.data && parsedResult.data.top_crops) {
+                    // Ambil top 3 tanaman dengan format crop dan probability
+                    const top3 = parsedResult.data.top_crops
+                        .slice(0, 3)
+                        .map(item => ({
+                            crop: item.crop,
+                            probability: item.probability
+                        }));
                     
-                } catch (parseError) {
-                    res.status(500).json({
-                        status: 'error',
-                        message: 'Failed to parse prediction result'
-                    });
+                    mqttService.publishRecommendation(top3);
+                    console.log('Rekomendasi dipublish ke MQTT:', top3);
                 }
-            });
+            } catch (apiError) {
+                console.error('ML API error:', apiError.message);
+                return res.status(500).json({
+                    status: 'error',
+                    message: 'Prediction failed. ML service is unreachable or returned an error.'
+                });
+            }
 
         } catch (error) {
             console.error('Prediction error:', error);
