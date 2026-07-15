@@ -1,3 +1,15 @@
+/*
+ * ==============================================================================
+ * NAMA PROYEK    : PENDEKATAN BERBASIS DATA LAHAN DALAM MENGATASI KETIDAKTEPATAN PEMILIHAN KOMODITAS PERTANIAN
+ * TANGGAL        : 15 Juli 2026
+ * INSTANSI       : Politeknik Negeri Lampung
+ * AUTHOR         : Hafish Arrusal Isfalana Dan Syahreza Riatma
+ * DESKRIPSI      : Kode Pengiriman GPS 
+ * BOARD          : TTGO LORA GPS
+ * VERSI          : 1.2
+ * ==============================================================================
+ */ 
+
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include <TinyGPS++.h>
@@ -5,11 +17,11 @@
 #include <Wire.h>
 
 // WiFi
-const char* ssid = "pm";
-const char* password = "0987654321";
+const char* ssid = "kmipn26";
+const char* password = "kmipn12345678";
 
 // MQTT
-const char* mqtt_server = "103.151.63.79";
+const char* mqtt_server = "103.151.63.77";
 const int mqtt_port = 1882;
 WiFiClient espClient;
 PubSubClient client(espClient);
